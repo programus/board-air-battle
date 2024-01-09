@@ -1,0 +1,16 @@
+.board {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5px;
+  border: double 5px black;
+  background-image: url("images/fighter-plane-2d.svg");
+  background-size: 50%;
+  background-position: 4px 4px;
+}
+
+.board-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}

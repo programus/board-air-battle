@@ -1,0 +1,14 @@
+.board-block {
+  aspect-ratio: 1;
+  width: 50px;
+  text-align: center;
+}
+
+.hitted {
+  background-color: brown;
+}
+
+.plane-body {
+  outline: solid 2px blue;
+  outline-offset: -1px;
+}
