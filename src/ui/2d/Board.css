@@ -1,12 +1,17 @@
+.board-frame {
+  position: relative;
+  border: double 5px black;
+  aspect-ratio: 1;
+}
+
 .board {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  position: absolute;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 5px;
-  border: double 5px black;
-  background-image: url("images/fighter-plane-2d.svg");
-  background-size: 50%;
-  background-position: 4px 4px;
 }
 
 .board-row {

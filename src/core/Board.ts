@@ -1,8 +1,8 @@
-import { Block, FighterPlane } from "."
+import { Block, FighterPlane, areArrayEqual } from "."
 import { FighterDirection } from './FighterPlane';
-import boards from './boards'
+import { boards } from './boards'
 
-export class Board {
+class Board {
   public static width = 10
   public static height = 10
   public static readyPlaneCount = 3
@@ -13,10 +13,12 @@ export class Board {
 
   private _blocks: Block[][]
   private _planes: FighterPlane[]
+  private _preparing : boolean
 
   constructor(planes?: FighterPlane[]) {
     this._blocks = [...Array(Board.height)].map((_, y) => [...Array(Board.width)].map((_, x) => new Block(this, [x, y])))
     this._planes = planes || []
+    this._preparing = false
   }
 
   public static generateBoard(planeString: string): Board {
@@ -38,7 +40,6 @@ export class Board {
       for (let j = i + 1; j < allPossiblePlanes.length; j++) {
         for (let k = j + 1; k < allPossiblePlanes.length; k++) {
           const board = new Board([allPossiblePlanes[i], allPossiblePlanes[j], allPossiblePlanes[k]])
-          board.putPlanesOn()
           if (board.isLayoutReady()) {
             ret.push(board)
           }
@@ -49,6 +50,10 @@ export class Board {
     return ret
   }
 
+  public cleanPlanes() {
+    this._planes = this._planes.filter(plane => plane.isReady())
+  }
+
   public get planes() {
     return this._planes
   }
@@ -57,8 +62,11 @@ export class Board {
     return this._blocks
   }
 
-  public putPlanesOn() {
-    this.planes.forEach(plane => plane.putOn(this))
+  public get preparing() : boolean {
+    return this._preparing;
+  }
+  public set preparing(v : boolean) {
+    this._preparing = v;
   }
 
   public isLayoutReady(): boolean {
@@ -76,12 +84,20 @@ export class Board {
 
   }
 
-  public getBlock(x: number, y: number): Block {
-    return this._blocks[y][x]
-  }
-
   public blockAt(p: [x: number, y: number]): Block {
     return this._blocks[p[1]][p[0]]
+  }
+
+  public getPlanes(p: [x: number, y: number]): FighterPlane[] {
+    return this.planes.filter(plane => plane.getBodyIndex(p) >= 0)
+  }
+
+  public getPlaneReadiness(): {[key: string]: boolean} {
+    const notReadyPositions = this._blocks.flat().filter(block => block.usedCount > 1).map(block => block.position)
+    return this.planes.reduce((result: {[key: string]: boolean}, curr) => {
+      result[curr.toString()] = areArrayEqual(...notReadyPositions, curr.pos)
+      return result
+    }, {})
   }
 
   public toPlaneString(): string {
@@ -96,4 +112,8 @@ export class Board {
       ' +' + '-'.repeat(Board.width * 3) + '+',
     ].join('\n')
   }
+}
+
+export {
+  Board,
 }

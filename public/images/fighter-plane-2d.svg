@@ -40,7 +40,7 @@
       opacity: 0.5;
     }
   </style>
-  <g id="outline" visibility="hidden">
+  <g id="outline" visibility="visible">
     <rect id="block" width="100" height="100" fill="none" stroke="rgba(0, 0, 0, 0.5)" x="200" y="0" />
     <use href="#block" y="100" />
     <use href="#block" y="100" x="-200" />
@@ -86,7 +86,7 @@
     <g id="propeller" class="propeller-color" transform="translate(250, 0)">
       <g id="propeller-content">
         <g id="propeller-right">
-          <path id="blade-right" d="M 1 0 C 20 -5 50 -10 60 0 C 50 10 20 5 1 0" transform="translate(0, 25)" />
+          <path id="blade-right" d="M 1 0 C 20 -5 45 -10 50 0 C 45 10 20 5 1 0" transform="translate(0, 25)" />
           <g class="cockpit-color">
             <path id="axis-right" d="M -1 20 C 2 20 10 20 10 45 L -1 45" />
           </g>
@@ -115,7 +115,7 @@
     </mask>
     <g id="body" class="body-color" transform="translate(250, 0)">
       <g id="body-shape">
-        <path id="body-right" d="M -2 38 L 30 38 C 50 38 50 38 50 100 L 49 100 C 35 350 2 370 -2 370" />
+        <path id="body-right" d="M -2 38 L 30 38 C 50 38 50 38 50 100 L 49 100 C 35 350 2 370 -2 370" transform="scale(0.93, 1)" />
         <use href="#body-right" transform="scale(-1, 1)" />
       </g>
       <g id="engine" class="engine-color" mask="url(#body-mask)">

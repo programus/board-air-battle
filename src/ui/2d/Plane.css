@@ -1,0 +1,46 @@
+.planes {
+  position: absolute;
+  width: 100%;
+  aspect-ratio: 1;
+}
+
+.planes div {
+  position: absolute;
+  background-image: url('images/fighter-plane-2d.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 50%;
+  height: 40%;
+  touch-action: none;
+}
+
+.plane-up {
+  transform: translate(-40%, 0) scaleX(-1);
+}
+
+.plane-down {
+  transform: rotate(180deg) translate(40%, 75%);
+}
+
+.plane-left {
+  transform: rotate(-90deg) translate(30%, -12.5%);
+}
+
+.plane-right {
+  transform: rotate(90deg) translate(-30%, 87.5%) scaleX(-1);
+}
+
+.plane-moving {
+  cursor: grab;
+  opacity: 0.7;
+  filter: grayscale(0.2);
+}
+
+.plane-not-ready {
+  opacity: 0.2;
+  filter: grayscale();
+}
+
+.moving-plane {
+  cursor: grab;
+}

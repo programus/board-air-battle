@@ -1,4 +1,4 @@
-export default [
+export const boards: string[] = [
   "FP:02<|FP:07<|FP:34<",
   "FP:02<|FP:07<|FP:35<",
   "FP:02<|FP:07<|FP:42<",

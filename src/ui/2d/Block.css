@@ -1,7 +1,10 @@
 .board-block {
   aspect-ratio: 1;
-  width: 50px;
+  width: 100%;
   text-align: center;
+  outline: solid 1px #ccc;
+  outline-offset: -1px;
+  pointer-events: none;
 }
 
 .hitted {
@@ -9,6 +12,11 @@
 }
 
 .plane-body {
-  outline: solid 2px blue;
-  outline-offset: -1px;
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.not-ready {
+  outline-color: red;
+  background-color: rgba(255, 0, 0, 0.5);
+  z-index: 10;
 }

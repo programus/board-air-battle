@@ -10,13 +10,17 @@ function BlockTag({block}: BlockProps) {
   const blockClass = classNames({
     'board-block': true,
     'hitted': block.isHitted(),
-    'plane-body': block.usedCount > 0,
+    'plane-body': block.usedCount == 1,
+    'not-ready': block.usedCount > 1,
   })
   return (
     <div className={blockClass}>
-      {block.toString()}
+      {/* {block.toString()} */}
     </div>
   )
 }
 
-export default BlockTag
+export { 
+  BlockTag,
+  type BlockProps,
+}

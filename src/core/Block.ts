@@ -1,10 +1,8 @@
-import {Board} from "."
+import {Board, areArrayEqual} from "."
 
 class Block {
   private _owner: Board
   private _pos: [x: number, y: number]
-  private _usedCount: number = 0
-  private _planeCoreCount: number = 0
   private _hitted: boolean = false
 
   constructor(owner: Board, pos: [x: number, y: number]) {
@@ -21,36 +19,20 @@ class Block {
   }
 
   public get usedCount() {
-    return this._usedCount
+    return this._owner.planes.map(plane => plane.blocksPos.filter(p => areArrayEqual(p, this._pos))).flat().length
   }
 
-  public set usedCount(value: number) {
-    this._usedCount = value
-  }
 
   public get planeCoreCount() {
-    return this._planeCoreCount
+    return this._owner.planes.filter(plane => areArrayEqual(plane.pos, this._pos)).length
   }
 
   public isPlaneCore() {
-    return this._planeCoreCount > 0
-  }
-
-  public use(isPlaneCore?: boolean) {
-    if (isPlaneCore) {
-      this._planeCoreCount++
-    } else {
-      this._usedCount++
-    }
-  }
-
-  public clean() {
-    this._usedCount = Math.max(0, this._usedCount - 1)
-    this._planeCoreCount = Math.max(0, this._planeCoreCount - 1)
+    return this.planeCoreCount > 0
   }
 
   public isReady() {
-    return this._usedCount <= 1 && this._planeCoreCount <= 1
+    return this.usedCount <= 1 && this.planeCoreCount <= 1
   }
 
   public isHitted(): boolean {
@@ -62,10 +44,12 @@ class Block {
   }
 
   public toString(): string {
-    const content = this._planeCoreCount ? ' ABCDEFG'[this._planeCoreCount] : (this._usedCount || ' ')
+    const content = this.planeCoreCount ? ' ABCDEFG'[this.planeCoreCount] : (this.usedCount || ' ')
     return this._hitted ? `<${content}>` : content === ' ' ? ` ${content} ` : `[${content}]`
   }
 
 }
 
-export default Block
+export {
+  Block,
+}
