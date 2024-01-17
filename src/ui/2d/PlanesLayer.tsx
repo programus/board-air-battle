@@ -1,4 +1,4 @@
-import { PointerEvent, MouseEvent, Component } from 'react'
+import { PointerEvent, MouseEvent, useRef, useState } from 'react'
 import { Board, FighterDirection, FighterPlane, areArrayEqual } from '../../core'
 import { PlaneTag } from './PlaneTag'
 import './Plane.css'
@@ -12,35 +12,35 @@ interface PlanesLayerProp {
 type TargetEvent<U, E> = (U extends PointerEvent ? PointerEvent<E> : MouseEvent<E>) & {currentTarget: E}
 type LayerTargetEvent<T> = TargetEvent<T, HTMLDivElement>
 
-class PlanesLayer extends Component<PlanesLayerProp> {
+function PlanesLayer({board, onUpdated}: PlanesLayerProp) {
+  const [,setUpdate] = useState({})
+  const forceUpdate = () => setUpdate({})
+  const {current: self} = useRef<{
+    focusedPlane: FighterPlane|null,
+    pressedPos: [number, number]|null,
+    dragged: boolean,
+    posOffset: [number, number],
+  }>({
+    focusedPlane: null,
+    pressedPos: null,
+    dragged: false,
+    posOffset: [0, 0],
+  })
+  console.log(board.toString())
 
-  private focusedPlane: FighterPlane|null
-  private pressedPos: [number, number]|null = null
-  private dragged: boolean = false
-  private board: Board
-  private posOffset: [number, number]
-
-  constructor(props: PlanesLayerProp) {
-    super(props)
-    this.board = props.board
-    this.focusedPlane = null
-    this.posOffset = [0, 0]
-    console.log(this.board.toString())
+  const refresh = () => {
+    forceUpdate()
+    onUpdated && onUpdated()
   }
 
-  private refresh() {
-    this.forceUpdate()
-    this.props.onUpdated && this.props.onUpdated()
-  }
-
-  private getBlockPosFromEvent(e: LayerTargetEvent<PointerEvent>): [x: number, y: number] {
+  function getBlockPosFromEvent(e: LayerTargetEvent<PointerEvent>): [x: number, y: number] {
       const rect = e.currentTarget.getBoundingClientRect()
       const x = Math.floor((e.clientX - rect.x) * Board.width / rect.width)
       const y = Math.floor((e.clientY - rect.y) * Board.height / rect.height)
       return [x, y]
   }
 
-  private generatePlane(pos: [x: number, y: number], board: Board): FighterPlane|null {
+  function generatePlane(pos: [x: number, y: number], board: Board): FighterPlane|null {
     let plane: FighterPlane | null = null;
     Object.values(FighterDirection).find(dir => {
       const p = new FighterPlane(pos, dir)
@@ -56,98 +56,96 @@ class PlanesLayer extends Component<PlanesLayerProp> {
     return plane
   }
 
-  private handlePointerDown = (e: LayerTargetEvent<PointerEvent>) => {
+  const handlePointerDown = (e: LayerTargetEvent<PointerEvent>) => {
     e.currentTarget.setPointerCapture(e.pointerId)
     e.preventDefault()
 
-    const blockPos = this.getBlockPosFromEvent(e)
-    const planesAtPoint = this.board.getPlanes(blockPos)
+    const blockPos = getBlockPosFromEvent(e)
+    const planesAtPoint = board.getPlanes(blockPos)
     if (planesAtPoint.length > 0) {
-      this.focusedPlane = planesAtPoint[planesAtPoint.length - 1]
-      this.posOffset = this.focusedPlane.pos.map((v, i) => v - blockPos[i]) as [number, number]
-      this.pressedPos = blockPos
-    } else if (this.board.planes.filter(p => p.isReady()).length < Board.readyPlaneCount) {
-      this.focusedPlane = this.generatePlane(blockPos, this.board)
+      self.focusedPlane = planesAtPoint[planesAtPoint.length - 1]
+      self.posOffset = self.focusedPlane.pos.map((v, i) => v - blockPos[i]) as [number, number]
+      self.pressedPos = blockPos
+    } else if (board.planes.filter(p => p.isReady()).length < Board.readyPlaneCount) {
+      self.focusedPlane = generatePlane(blockPos, board)
     } else {
       e.currentTarget.releasePointerCapture(e.pointerId)
       // warn user max count
     }
-    if (this.focusedPlane) {
-      this.focusedPlane.moving = true
+    if (self.focusedPlane) {
+      self.focusedPlane.moving = true
     }
-    this.refresh()
-    console.log(this.board.toString())
+    refresh()
+    console.log(board.toString())
   }
 
-  private handlePointerUp = (e: LayerTargetEvent<PointerEvent>) => {
+  const handlePointerUp = (e: LayerTargetEvent<PointerEvent>) => {
     e.currentTarget.releasePointerCapture(e.pointerId)
-    if (this.focusedPlane) {
-      if (this.pressedPos && !this.dragged) {
+    if (self.focusedPlane) {
+      if (self.pressedPos && !self.dragged) {
         // rotate plane
         for (let i = 0; i < Object.values(FighterDirection).length; i++) {
-          this.focusedPlane = this.focusedPlane.rotate(this.pressedPos)
-          if (this.focusedPlane.isReady()) {
+          self.focusedPlane = self.focusedPlane.rotate(self.pressedPos)
+          if (self.focusedPlane.isReady()) {
             break
           }
         }
       }
-      this.focusedPlane.moving = false
-      this.focusedPlane = null
+      self.focusedPlane.moving = false
+      self.focusedPlane = null
     }
-    this.board.cleanPlanes()
-    this.refresh()
-    this.pressedPos = null
-    this.dragged = false
-    console.log(this.board.toString())
+    board.cleanPlanes()
+    refresh()
+    self.pressedPos = null
+    self.dragged = false
+    console.log(board.toString())
   }
 
-  private handlePointerMove = (e: LayerTargetEvent<PointerEvent>) => {
+  const handlePointerMove = (e: LayerTargetEvent<PointerEvent>) => {
     if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-      const blockPos = this.getBlockPosFromEvent(e)
-      if (this.pressedPos && !areArrayEqual(blockPos, this.pressedPos)) {
-        this.dragged = true
+      const blockPos = getBlockPosFromEvent(e)
+      if (self.pressedPos && !areArrayEqual(blockPos, self.pressedPos)) {
+        self.dragged = true
       }
-      let needPlane = !this.focusedPlane
-      if (this.focusedPlane) {
-        this.focusedPlane.pos = blockPos.map((v, i) => v + this.posOffset[i]) as [number, number]
-        if (!this.focusedPlane.isReady()) {
+      let needPlane = !self.focusedPlane
+      if (self.focusedPlane) {
+        self.focusedPlane.pos = blockPos.map((v, i) => v + self.posOffset[i]) as [number, number]
+        if (!self.focusedPlane.isReady()) {
           needPlane = true
         }
       }
       if (needPlane) {
-        this.focusedPlane = this.generatePlane(blockPos, this.board) || this.focusedPlane
+        self.focusedPlane = generatePlane(blockPos, board) || self.focusedPlane
       }
-      console.log(this.focusedPlane)
-      if (this.focusedPlane) {
-        this.focusedPlane.moving = true
+      if (self.focusedPlane) {
+        self.focusedPlane.moving = true
       }
-      this.refresh()
+      refresh()
     }
   }
 
-  render() {
-    const classes = classNames({
-      'planes': true,
-      'moving-plane': this.focusedPlane && this.focusedPlane.moving,
-    })
-    const planeReadiness = this.board.getPlaneReadiness()
-    return (
-      <div 
-        className={classNames(classes)}
-        onPointerDown={this.handlePointerDown}
-        onPointerUp={this.handlePointerUp}
-        onPointerMove={this.handlePointerMove}
-      >
-        {
-          this.board.planes.map((plane, i) => (
-            <PlaneTag key={i} plane={plane} notLayoutReady={!planeReadiness[plane.toString()]} />
-          ))
-        }
-      </div>
-    )
-  }
+  const classes = classNames({
+    'planes': true,
+    'moving-plane': self.focusedPlane && self.focusedPlane.moving,
+  })
+  const planeReadiness = board.getPlaneReadiness()
+  return (
+    <div 
+      className={classNames(classes)}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerMove={handlePointerMove}
+    >
+      {
+        board.planes.map((plane, i) => (
+          <PlaneTag key={i} plane={plane} notLayoutReady={!planeReadiness[plane.toString()]} />
+        ))
+      }
+    </div>
+  )
 
 }
+
 
 export {
   PlanesLayer,

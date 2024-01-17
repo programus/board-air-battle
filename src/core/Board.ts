@@ -2,6 +2,13 @@ import { Block, FighterPlane, areArrayEqual } from "."
 import { FighterDirection } from './FighterPlane';
 import { boards } from './boards'
 
+enum BoardState {
+  Preparing,
+  Fighting,
+  Analyzing,
+  Over,
+}
+
 class Board {
   public static width = 10
   public static height = 10
@@ -13,12 +20,18 @@ class Board {
 
   private _blocks: Block[][]
   private _planes: FighterPlane[]
-  private _preparing : boolean
+  private _guessPlanes: FighterPlane[]
+  private _useGuessPlanes: boolean|null
+  private _state: BoardState
+  private _enemy: boolean
 
   constructor(planes?: FighterPlane[]) {
     this._blocks = [...Array(Board.height)].map((_, y) => [...Array(Board.width)].map((_, x) => new Block(this, [x, y])))
     this._planes = planes || []
-    this._preparing = false
+    this._guessPlanes = []
+    this._useGuessPlanes = null
+    this._state = BoardState.Preparing
+    this._enemy = false
   }
 
   public static generateBoard(planeString: string): Board {
@@ -50,23 +63,39 @@ class Board {
     return ret
   }
 
+  private get useGuessPlanes() {
+    return this._useGuessPlanes !== null ? this._useGuessPlanes : (this.isEnemy && this.state !== BoardState.Over)
+  }
+
   public cleanPlanes() {
-    this._planes = this._planes.filter(plane => plane.isReady())
+    const filterFn = (plane: FighterPlane) => plane.isReady()
+    if (this.useGuessPlanes) {
+      this._guessPlanes = this._guessPlanes.filter(filterFn)
+    } else {
+      this._planes = this._planes.filter(filterFn)
+    }
   }
 
   public get planes() {
-    return this._planes
+    return this.useGuessPlanes ? this._guessPlanes : this._planes
   }
 
   public get blocks(): Block[][] {
     return this._blocks
   }
 
-  public get preparing() : boolean {
-    return this._preparing;
+  public get state(): BoardState {
+    return this._state
   }
-  public set preparing(v : boolean) {
-    this._preparing = v;
+  public set state(v: BoardState) {
+    this._state = v
+  }
+
+  public get isEnemy(): boolean {
+    return this._enemy
+  }
+  public set isEnemy(v: boolean) {
+    this._enemy = v
   }
 
   public isLayoutReady(): boolean {
@@ -106,14 +135,20 @@ class Board {
   }
 
   public toString(): string {
-    return [
-      '  ' + [...Array(Board.width)].map((_, i) => `_${i}_`).join('') + ' ',
-      this._blocks.map((row, i) => `${i}|${row.join('')}|`).join('\n'),
-      ' +' + '-'.repeat(Board.width * 3) + '+',
-    ].join('\n')
+    const maps = [false, true].map(v => {
+      this._useGuessPlanes = v
+      return [
+        '  ' + [...Array(Board.width)].map((_, i) => `_${i}_`).join('') + ' ',
+        ...this._blocks.map((row, i) => `${i}|${row.join('')}|`),
+        ' +' + '-'.repeat(Board.width * 3) + '+',
+      ]
+    })
+    return `State: ${BoardState[this.state]}  Enemy: ${this.isEnemy}
+    ${maps[0].map((_, c) => maps.map(r => r[c]).join('  ')).join('\n')}`
   }
 }
 
 export {
+  BoardState,
   Board,
 }
