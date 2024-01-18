@@ -6,6 +6,7 @@ type TargetEvent<U, E> = (U extends PointerEvent ? PointerEvent<E> : MouseEvent<
 type InteractEvent = TargetEvent<PointerEvent, HTMLElementType>
 
 interface BoardPlayState {
+  newPlane: FighterPlane|null,
   focusedPlane: FighterPlane|null,
   pressedPos: [number, number]|null,
   dragged: boolean,

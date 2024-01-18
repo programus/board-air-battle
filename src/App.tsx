@@ -5,7 +5,7 @@ import { BoardTag } from './ui/2d/BoardTag'
 
 function App() {
   const board = Board.allPossible[Math.floor(Math.random() * Board.allPossible.length)]
-  board.isEnemy = true
+  // board.isEnemy = true
   // const board = new Board()
   const points: [x: number, y: number][] = [
     // [0, 0],

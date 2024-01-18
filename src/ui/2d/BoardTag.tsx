@@ -2,7 +2,7 @@ import './Board.css'
 import { Board } from '../../core';
 import { BlockTag } from './BlockTag';
 import { PlanesLayer } from './PlanesLayer';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { BoardState } from '../../core/Board';
 
 interface BoardProps {
@@ -12,14 +12,17 @@ interface BoardProps {
 
 function BoardTag({board, width}: BoardProps) {
   const [,setUpdate] = useState({})
-  const forceUpdate = () => setUpdate({})
+  const forceUpdate = useCallback(() => setUpdate({}), [])
   const blocks = board.blocks
 
   return (
     <>
       <div className='control-bar'>
         <select 
-          onChange={e => board.state = BoardState[e.target.value as keyof typeof BoardState]}
+          onChange={e => {
+            board.state = BoardState[e.target.value as keyof typeof BoardState]
+            forceUpdate()
+          }}
           defaultValue={board.state}
         >
           {
@@ -31,7 +34,10 @@ function BoardTag({board, width}: BoardProps) {
         <label>
           <input type='checkbox' 
             defaultChecked={board.isEnemy}
-            onChange={e => board.isEnemy = e.target.checked}
+            onChange={e => {
+              board.isEnemy = e.target.checked
+              forceUpdate()
+            }}
           />Enemy
         </label>
       </div>

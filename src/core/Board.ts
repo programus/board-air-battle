@@ -143,8 +143,8 @@ class Board {
         ' +' + '-'.repeat(Board.width * 3) + '+',
       ]
     })
-    return `State: ${BoardState[this.state]}  Enemy: ${this.isEnemy}
-    ${maps[0].map((_, c) => maps.map(r => r[c]).join('  ')).join('\n')}`
+    this._useGuessPlanes = null
+    return `State: ${BoardState[this.state]}  Enemy: ${this.isEnemy}\n${maps[0].map((_, c) => maps.map(r => r[c]).join('  ')).join('\n')}`
   }
 }
 

@@ -1,4 +1,4 @@
-import { useReducer } from 'react'
+import { useEffect, useReducer } from 'react'
 import { Board, } from '../../core'
 import { PlaneTag } from './PlaneTag'
 import './Plane.css'
@@ -12,6 +12,7 @@ interface PlanesLayerProp {
 }
 
 const initialState = {
+  newPlane: null,
   focusedPlane: null,
   pressedPos: null,
   dragged: false,
@@ -20,6 +21,17 @@ const initialState = {
 
 function PlanesLayer({board, onUpdated}: PlanesLayerProp) {
   const [state, dispatch] = useReducer<(prevState: BoardPlayState, action: Action) => BoardPlayState>(reducer, initialState)
+  useEffect(() => {
+    // add plane
+    if (state.newPlane) {
+      board.planes.push(state.newPlane)
+      board.cleanPlanes()
+    }
+    console.log(board.toString())
+    console.log(board.planes)
+    // re-render parent
+    onUpdated && onUpdated()
+  }, [board, state, onUpdated])
 
   const handlePointerEvents = (e: InteractEvent) => {
     dispatch({
@@ -28,7 +40,6 @@ function PlanesLayer({board, onUpdated}: PlanesLayerProp) {
       event: e,
       target: e.currentTarget,
     })
-    onUpdated && onUpdated()
   }
 
   const classes = classNames({

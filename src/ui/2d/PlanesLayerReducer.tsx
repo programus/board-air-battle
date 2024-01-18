@@ -9,7 +9,7 @@ function getBlockPosFromEvent(e: InteractEvent, target: HTMLElementType): [x: nu
     return [x, y]
 }
 
-function generatePlane(pos: [x: number, y: number], board: Board): FighterPlane|null {
+function generatePlane(pos: [x: number, y: number]): FighterPlane|null {
   let plane: FighterPlane | null = null;
   Object.values(FighterDirection).find(dir => {
     const p = new FighterPlane(pos, dir)
@@ -18,10 +18,6 @@ function generatePlane(pos: [x: number, y: number], board: Board): FighterPlane|
     }
     return p.isReady()
   })
-  if (plane) {
-    board.planes.push(plane)
-    board.cleanPlanes()
-  }
   return plane
 }
 
@@ -36,7 +32,7 @@ function pointerDownPreparing(state: BoardPlayState, {board, event, target}: Act
     state.posOffset = state.focusedPlane.pos.map((v, i) => v - blockPos[i]) as [number, number]
     state.pressedPos = blockPos
   } else if (board.planes.filter(p => p.isReady()).length < Board.readyPlaneCount) {
-    state.focusedPlane = generatePlane(blockPos, board)
+    state.newPlane = state.focusedPlane = generatePlane(blockPos)
   } else {
     event.currentTarget.releasePointerCapture(event.pointerId)
     // warn user max count
@@ -66,7 +62,7 @@ function pointerUpPreparing(state: BoardPlayState, {board, event, target}: Actio
   state.dragged = false
 }
 
-function pointerMovePreparing(state: BoardPlayState, {board, event, target}: Action): boolean {
+function pointerMovePreparing(state: BoardPlayState, {event, target}: Action): boolean {
   const captured = target.hasPointerCapture(event.pointerId)
   if (captured) {
     const blockPos = getBlockPosFromEvent(event, target)
@@ -81,7 +77,8 @@ function pointerMovePreparing(state: BoardPlayState, {board, event, target}: Act
       }
     }
     if (needPlane) {
-      state.focusedPlane = generatePlane(blockPos, board) || state.focusedPlane
+      state.newPlane = generatePlane(blockPos)
+      state.focusedPlane = state.newPlane || state.focusedPlane
     }
     if (state.focusedPlane) {
       state.focusedPlane.moving = true
@@ -97,6 +94,7 @@ function reducer(state: BoardPlayState, action: Action): BoardPlayState {
     case ActionType.PreparingAction: {
       let changed = true
       const eventType = event.type.toLowerCase()
+      state.newPlane = null
       if (eventType.includes('down')) {
         pointerDownPreparing(state, action)
       } else if (eventType.includes('up')) {
