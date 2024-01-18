@@ -8,9 +8,9 @@ function App() {
   // board.isEnemy = true
   // const board = new Board()
   const points: [x: number, y: number][] = [
-    // [0, 0],
-    // [3, 2],
-    // [5, 5],
+    [0, 0],
+    [3, 2],
+    [5, 5],
   ]
   points.map(v => board.blockAt(v).setHitted(true))
   return (

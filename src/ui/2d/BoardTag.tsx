@@ -26,8 +26,8 @@ function BoardTag({board, width}: BoardProps) {
           defaultValue={board.state}
         >
           {
-            Object.entries(BoardState).filter(([k, ]) => isNaN(Number(k))).map(([k, v], i) => (
-              <option key={i} value={v}>{k}</option>
+            Object.entries(BoardState).filter(([k, ]) => isNaN(Number(k))).map(([k, ], i) => (
+              <option key={i} value={k}>{k}</option>
             ))
           }
         </select>

@@ -7,12 +7,18 @@
   pointer-events: none;
 }
 
-.hitted {
-  background-color: brown;
-}
-
 .plane-body {
   background-color: rgba(0, 0, 0, 0.15);
+}
+
+.hitted {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.hitted.plane-body {
+  background-image: url('images/body-hitted.svg');
+  background-size: cover;
 }
 
 .not-ready {
