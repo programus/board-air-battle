@@ -7,7 +7,7 @@ interface PlaneProps {
   notLayoutReady?: boolean,
 }
 
-function PlaneTag({plane, notLayoutReady: layoutReady}: PlaneProps) {
+function PlaneTag({plane, notLayoutReady}: PlaneProps) {
   const directionClassMap = {
     [FighterDirection.Up]: 'plane-up',
     [FighterDirection.Down]: 'plane-down',
@@ -18,7 +18,7 @@ function PlaneTag({plane, notLayoutReady: layoutReady}: PlaneProps) {
   const tagClasses = classNames({
     [directionClassMap[plane.dir]]: true,
     'plane-moving': plane.moving,
-    'plane-not-ready': !plane.isReady() || layoutReady,
+    'plane-not-ready': !plane.isReady() || notLayoutReady,
   })
   return (
     <div className={tagClasses} style={{

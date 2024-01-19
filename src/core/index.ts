@@ -1,6 +1,6 @@
-import { Block } from './Block'
+import { Block, HittedType } from './Block'
 import { FighterPlane, FighterDirection } from './FighterPlane';
-import { Board } from './Board'
+import { Board, BoardState } from './Board'
 
 function areArrayEqual<T>(...aa: T[][]): boolean {
   let ret = true
@@ -13,8 +13,10 @@ function areArrayEqual<T>(...aa: T[][]): boolean {
 
 export {
   areArrayEqual,
+  HittedType,
   Block,
   FighterPlane,
   FighterDirection,
   Board,
+  BoardState,
 }

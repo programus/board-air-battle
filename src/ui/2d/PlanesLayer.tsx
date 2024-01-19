@@ -23,12 +23,12 @@ function PlanesLayer({board, onUpdated}: PlanesLayerProp) {
   const [state, dispatch] = useReducer<(prevState: BoardPlayState, action: Action) => BoardPlayState>(reducer, initialState)
   useEffect(() => {
     // add plane
+    console.log('new plane: ', state.newPlane?.toString())
     if (state.newPlane) {
       board.planes.push(state.newPlane)
       board.cleanPlanes()
     }
-    console.log(board.toString())
-    console.log(board.planes)
+    console.log(board.toPlaneString())
     // re-render parent
     onUpdated && onUpdated()
   }, [board, state, onUpdated])

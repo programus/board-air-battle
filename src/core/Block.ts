@@ -1,5 +1,12 @@
 import {Board, areArrayEqual} from "."
 
+enum HittedType {
+  NotHitted,
+  Empty,
+  PlaneBody,
+  PlaneCore,
+}
+
 class Block {
   private _owner: Board
   private _pos: [x: number, y: number]
@@ -43,6 +50,16 @@ class Block {
     this._hitted = (typeof hitted === 'undefined') || hitted
   }
 
+  public get hittedType(): HittedType {
+    const planeCore = this._owner.fixedPlanes.find(plane => areArrayEqual(plane.pos, this._pos))
+    const planeBody = this._owner.fixedPlanes.find(plane => plane.blocksPos.find(p => areArrayEqual(p, this._pos)))
+    return this._hitted ? (
+      planeCore ? HittedType.PlaneCore : (
+        planeBody ? HittedType.PlaneBody : HittedType.Empty
+      )
+    ) : HittedType.NotHitted
+  }
+
   public toString(): string {
     const content = this.planeCoreCount ? ' ABCDEFG'[this.planeCoreCount] : (this.usedCount || ' ')
     return this._hitted ? `<${content}>` : content === ' ' ? ` ${content} ` : `[${content}]`
@@ -51,5 +68,6 @@ class Block {
 }
 
 export {
+  HittedType,
   Block,
 }

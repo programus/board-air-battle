@@ -62,20 +62,25 @@ function pointerUpPreparing(state: BoardPlayState, {board, event, target}: Actio
   state.dragged = false
 }
 
-function pointerMovePreparing(state: BoardPlayState, {event, target}: Action): boolean {
+function pointerMovePreparing(state: BoardPlayState, {event, target}: Action): BoardPlayState {
   const captured = target.hasPointerCapture(event.pointerId)
   if (captured) {
+    state = {...state}
+    console.log(new Date().getTime())
     const blockPos = getBlockPosFromEvent(event, target)
+    console.log(blockPos, state.focusedPlane?.toString())
     if (state.pressedPos && !areArrayEqual(blockPos, state.pressedPos)) {
       state.dragged = true
     }
     let needPlane = !state.focusedPlane
     if (state.focusedPlane) {
       state.focusedPlane.pos = blockPos.map((v, i) => v + state.posOffset[i]) as [number, number]
+      console.log('after move', state.focusedPlane?.toString(), state.focusedPlane.isReady())
       if (!state.focusedPlane.isReady()) {
         needPlane = true
       }
     }
+    console.log(`need plane: ${needPlane}`)
     if (needPlane) {
       state.newPlane = generatePlane(blockPos)
       state.focusedPlane = state.newPlane || state.focusedPlane
@@ -83,8 +88,9 @@ function pointerMovePreparing(state: BoardPlayState, {event, target}: Action): b
     if (state.focusedPlane) {
       state.focusedPlane.moving = true
     }
+    console.log(state.focusedPlane?.toString(), state.newPlane?.toString())
   }
-  return captured
+  return state
 }
 
 function reducer(state: BoardPlayState, action: Action): BoardPlayState {
@@ -92,7 +98,6 @@ function reducer(state: BoardPlayState, action: Action): BoardPlayState {
   const { type, event } = action
   switch (type) {
     case ActionType.PreparingAction: {
-      let changed = true
       const eventType = event.type.toLowerCase()
       state.newPlane = null
       if (eventType.includes('down')) {
@@ -100,11 +105,9 @@ function reducer(state: BoardPlayState, action: Action): BoardPlayState {
       } else if (eventType.includes('up')) {
         pointerUpPreparing(state, action)
       } else if (eventType.includes('move')) {
-        changed = pointerMovePreparing(state, action)
+        return pointerMovePreparing(state, action)
       }
-      if (changed) {
-        ret = {...state}
-      }
+      ret = {...state}
     }
   }
   return ret

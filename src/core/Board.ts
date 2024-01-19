@@ -80,6 +80,10 @@ class Board {
     return this.useGuessPlanes ? this._guessPlanes : this._planes
   }
 
+  public get fixedPlanes() {
+    return this._planes
+  }
+
   public get blocks(): Block[][] {
     return this._blocks
   }

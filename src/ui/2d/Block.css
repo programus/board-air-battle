@@ -7,18 +7,31 @@
   pointer-events: none;
 }
 
+.covered {
+  background-color: white;
+}
+
 .plane-body {
   background-color: rgba(0, 0, 0, 0.15);
 }
 
-.hitted {
-  background-color: rgba(0, 0, 0, 0.5);
+.hitted-Empty {
+  background-color: rgba(0, 0, 0, 0);
   z-index: 10;
 }
 
-.hitted.plane-body {
+.hitted-PlaneBody {
   background-image: url('images/body-hitted.svg');
   background-size: cover;
+  background-color: rgba(0, 0, 0, 0);
+  z-index: 10;
+}
+
+.hitted-PlaneCore {
+  background-image: url('images/body-hitted.svg');
+  background-size: cover;
+  background-color: red;
+  z-index: 10;
 }
 
 .not-ready {
