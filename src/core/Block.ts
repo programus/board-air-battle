@@ -46,8 +46,10 @@ class Block {
     return this._hitted
   }
 
-  public setHitted(hitted?: boolean) {
+  public setHitted(hitted?: boolean): boolean {
+    const old = this._hitted
     this._hitted = (typeof hitted === 'undefined') || hitted
+    return old
   }
 
   public get hittedType(): HittedType {

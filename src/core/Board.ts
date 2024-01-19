@@ -68,11 +68,17 @@ class Board {
   }
 
   public cleanPlanes(...planes: FighterPlane[]) {
-    const filterFn = (plane: FighterPlane) => plane.isReady() && !planes.find(p => p.equals(plane))
+    const filterFn = (plane: FighterPlane, i: number, a: FighterPlane[]) => plane.isReady() && !planes.find(p => p.equals(plane)) && a.findIndex(p => p.equals(plane)) === i
     if (this.useGuessPlanes) {
       this._guessPlanes = this._guessPlanes.filter(filterFn)
     } else {
       this._planes = this._planes.filter(filterFn)
+    }
+  }
+
+  public addPlane(plane: FighterPlane) {
+    if (!this.planes.find(p => p.equals(plane))) {
+      this.planes.push(plane)
     }
   }
 

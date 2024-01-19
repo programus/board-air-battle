@@ -97,12 +97,19 @@ function pointerMovePreparing(state: BoardPlayState, {event, target}: Action): B
   return state
 }
 
+function pointerUpFighting(state: BoardPlayState, {board, event, target}: Action): BoardPlayState {
+  const blockPos = getBlockPosFromEvent(event, target)
+  const isNewHit = board.blockAt(blockPos).setHitted(true)
+  return isNewHit ? {...state} : state
+}
+
 function reducer(state: BoardPlayState, action: Action): BoardPlayState {
   let ret = state
   const { type, event } = action
+  const eventType = event.type.toLowerCase()
   switch (type) {
-    case ActionType.PreparingAction: {
-      const eventType = event.type.toLowerCase()
+    case ActionType.PreparingAction: 
+    case ActionType.AnalyzingAction: {
       const func = {
         pointerdown: pointerDownPreparing,
         pointerup: pointerUpPreparing,
@@ -110,6 +117,12 @@ function reducer(state: BoardPlayState, action: Action): BoardPlayState {
       }[eventType]
       if (func) {
         ret = func(state, action)
+      }
+      break
+    }
+    case ActionType.FightingAction: {
+      if (eventType === 'pointerup') {
+        ret = pointerUpFighting(state, action)
       }
     }
   }

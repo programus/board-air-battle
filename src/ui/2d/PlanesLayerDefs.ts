@@ -23,6 +23,8 @@ interface Action {
 
 enum ActionType {
   PreparingAction,
+  FightingAction,
+  AnalyzingAction,
 }
 
 export {

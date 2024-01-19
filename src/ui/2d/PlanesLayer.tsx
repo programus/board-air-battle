@@ -1,5 +1,5 @@
 import { useEffect, useReducer } from 'react'
-import { Board, } from '../../core'
+import { Board, BoardState, } from '../../core'
 import { PlaneTag } from './PlaneTag'
 import './Plane.css'
 import classNames from 'classnames'
@@ -26,7 +26,7 @@ function PlanesLayer({board, onUpdated}: PlanesLayerProp) {
     // add plane
     if (state.newPlane) {
       board.cleanPlanes(...state.removePlanes)
-      board.planes.push(state.newPlane)
+      board.addPlane(state.newPlane)
     }
     console.log(board.toString())
     // re-render parent
@@ -34,12 +34,20 @@ function PlanesLayer({board, onUpdated}: PlanesLayerProp) {
   }, [board, state, onUpdated])
 
   const handlePointerEvents = (e: InteractEvent) => {
-    dispatch({
-      type: ActionType.PreparingAction,
-      board,
-      event: e,
-      target: e.currentTarget,
-    })
+    const actionMap: {[key: number]: ActionType} = {
+      [BoardState.Preparing]: ActionType.PreparingAction,
+      [BoardState.Fighting]: ActionType.FightingAction,
+      [BoardState.Analyzing]: ActionType.AnalyzingAction,
+    }
+
+    if ((e.buttons & 0x01) === 1 || e.button === 0) {
+      dispatch({
+        type: actionMap[board.state],
+        board,
+        event: e,
+        target: e.currentTarget,
+      })
+    }
   }
 
   const classes = classNames({
