@@ -21,7 +21,8 @@ function generatePlane(pos: [x: number, y: number]): FighterPlane|null {
   return plane
 }
 
-function pointerDownPreparing(state: BoardPlayState, {board, event, target}: Action) {
+function pointerDownPreparing(state: BoardPlayState, {board, event, target}: Action): BoardPlayState {
+  state = {...state, newPlane: null}
   target.setPointerCapture(event.pointerId)
   event.preventDefault()
 
@@ -40,9 +41,11 @@ function pointerDownPreparing(state: BoardPlayState, {board, event, target}: Act
   if (state.focusedPlane) {
     state.focusedPlane.moving = true
   }
+  return state
 }
 
-function pointerUpPreparing(state: BoardPlayState, {board, event, target}: Action) {
+function pointerUpPreparing(state: BoardPlayState, {board, event, target}: Action): BoardPlayState {
+  state = {...state, newPlane: null}
   target.releasePointerCapture(event.pointerId)
   if (state.focusedPlane) {
     if (state.pressedPos && !state.dragged) {
@@ -60,27 +63,24 @@ function pointerUpPreparing(state: BoardPlayState, {board, event, target}: Actio
   board.cleanPlanes()
   state.pressedPos = null
   state.dragged = false
+  return state
 }
 
 function pointerMovePreparing(state: BoardPlayState, {event, target}: Action): BoardPlayState {
   const captured = target.hasPointerCapture(event.pointerId)
   if (captured) {
-    state = {...state}
-    console.log(new Date().getTime())
+    state = {...state, newPlane: null}
     const blockPos = getBlockPosFromEvent(event, target)
-    console.log(blockPos, state.focusedPlane?.toString())
     if (state.pressedPos && !areArrayEqual(blockPos, state.pressedPos)) {
       state.dragged = true
     }
     let needPlane = !state.focusedPlane
     if (state.focusedPlane) {
       state.focusedPlane.pos = blockPos.map((v, i) => v + state.posOffset[i]) as [number, number]
-      console.log('after move', state.focusedPlane?.toString(), state.focusedPlane.isReady())
       if (!state.focusedPlane.isReady()) {
         needPlane = true
       }
     }
-    console.log(`need plane: ${needPlane}`)
     if (needPlane) {
       state.newPlane = generatePlane(blockPos)
       state.focusedPlane = state.newPlane || state.focusedPlane
@@ -88,7 +88,6 @@ function pointerMovePreparing(state: BoardPlayState, {event, target}: Action): B
     if (state.focusedPlane) {
       state.focusedPlane.moving = true
     }
-    console.log(state.focusedPlane?.toString(), state.newPlane?.toString())
   }
   return state
 }
@@ -99,15 +98,14 @@ function reducer(state: BoardPlayState, action: Action): BoardPlayState {
   switch (type) {
     case ActionType.PreparingAction: {
       const eventType = event.type.toLowerCase()
-      state.newPlane = null
-      if (eventType.includes('down')) {
-        pointerDownPreparing(state, action)
-      } else if (eventType.includes('up')) {
-        pointerUpPreparing(state, action)
-      } else if (eventType.includes('move')) {
-        return pointerMovePreparing(state, action)
+      const func = {
+        pointerdown: pointerDownPreparing,
+        pointerup: pointerUpPreparing,
+        pointermove: pointerMovePreparing,
+      }[eventType]
+      if (func) {
+        ret = func(state, action)
       }
-      ret = {...state}
     }
   }
   return ret
