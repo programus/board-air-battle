@@ -7,6 +7,7 @@ type InteractEvent = TargetEvent<PointerEvent, HTMLElementType>
 
 interface BoardPlayState {
   newPlane: FighterPlane|null,
+  removePlanes: FighterPlane[],
   focusedPlane: FighterPlane|null,
   pressedPos: [number, number]|null,
   dragged: boolean,

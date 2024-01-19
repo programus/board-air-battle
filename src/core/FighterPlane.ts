@@ -120,6 +120,10 @@ class FighterPlane {
     return this
   }
 
+  public clone(): FighterPlane {
+    return new FighterPlane(this._pos, this._dir)
+  }
+
   public toString(): string {
     return `FP:${this._pos[0]}${this._pos[1]}${this._dir}`
   }
@@ -134,6 +138,10 @@ class FighterPlane {
       ret = new FighterPlane(pos, dir)
     }
     return ret
+  }
+
+  public equals(plane: FighterPlane): boolean {
+    return areArrayEqual(this._pos, plane._pos) && this._dir === plane._dir
   }
 }
 

@@ -13,6 +13,7 @@ interface PlanesLayerProp {
 
 const initialState = {
   newPlane: null,
+  removePlanes: [],
   focusedPlane: null,
   pressedPos: null,
   dragged: false,
@@ -23,12 +24,11 @@ function PlanesLayer({board, onUpdated}: PlanesLayerProp) {
   const [state, dispatch] = useReducer<(prevState: BoardPlayState, action: Action) => BoardPlayState>(reducer, initialState)
   useEffect(() => {
     // add plane
-    console.log('new plane: ', state.newPlane?.toString())
     if (state.newPlane) {
+      board.cleanPlanes(...state.removePlanes)
       board.planes.push(state.newPlane)
-      board.cleanPlanes()
     }
-    console.log(board.toPlaneString())
+    console.log(board.toString())
     // re-render parent
     onUpdated && onUpdated()
   }, [board, state, onUpdated])

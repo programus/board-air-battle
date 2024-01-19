@@ -1,4 +1,5 @@
 .board-block {
+  position: relative;
   aspect-ratio: 1;
   width: 100%;
   text-align: center;
@@ -21,17 +22,28 @@
 }
 
 .hitted-PlaneBody {
-  background-image: url('images/body-hitted.svg');
-  background-size: cover;
   background-color: rgba(0, 0, 0, 0);
   z-index: 10;
 }
 
 .hitted-PlaneCore {
+  background-color: rgba(255, 0, 0, 0.7);
+  z-index: 10;
+}
+
+.explode-image {
+  position: absolute;
   background-image: url('images/body-hitted.svg');
   background-size: cover;
-  background-color: red;
-  z-index: 10;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  display: none;
+}
+
+.hitted.explode-image {
+  display: block;
 }
 
 .not-ready {

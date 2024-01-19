@@ -67,8 +67,8 @@ class Board {
     return this._useGuessPlanes !== null ? this._useGuessPlanes : (this.isEnemy && this.state !== BoardState.Over)
   }
 
-  public cleanPlanes() {
-    const filterFn = (plane: FighterPlane) => plane.isReady()
+  public cleanPlanes(...planes: FighterPlane[]) {
+    const filterFn = (plane: FighterPlane) => plane.isReady() && !planes.find(p => p.equals(plane))
     if (this.useGuessPlanes) {
       this._guessPlanes = this._guessPlanes.filter(filterFn)
     } else {
@@ -128,7 +128,7 @@ class Board {
   public getPlaneReadiness(): {[key: string]: boolean} {
     const notReadyPositions = this._blocks.flat().filter(block => block.usedCount > 1).map(block => block.position)
     return this.planes.reduce((result: {[key: string]: boolean}, curr) => {
-      result[curr.toString()] = areArrayEqual(...notReadyPositions, curr.pos)
+      result[curr.toString()] = !curr.blocksPos.find(p => notReadyPositions.find(np => areArrayEqual(p, np)))
       return result
     }, {})
   }

@@ -8,7 +8,7 @@ interface BlockProps {
 }
 
 function BlockTag({block}: BlockProps) {
-  const rotation =  useMemo(() => Math.floor(Math.random() * 4) * 90, [])
+  const rotation =  useMemo(() => Math.random() * 360, [])
   const blockClass = classNames({
     'covered': block.owner.state === BoardState.Fighting,
     'board-block': true,
@@ -16,10 +16,15 @@ function BlockTag({block}: BlockProps) {
     'not-ready': block.usedCount > 1,
     [`hitted-${HittedType[block.hittedType]}`]: true
   })
+  const explodeClass = classNames({
+    'explode-image': true,
+    'hitted': [HittedType.PlaneBody, HittedType.PlaneCore].includes(block.hittedType),
+  })
   return (
-    <div className={blockClass} style={{
-      transform: `rotate(${rotation}deg)`,
-    }}>
+    <div className={blockClass}>
+      <div className={explodeClass} style={{
+        transform: `rotate(${rotation}deg)`,
+      }}></div>
       {/* {block.toString()} */}
     </div>
   )

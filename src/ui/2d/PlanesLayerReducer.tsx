@@ -35,7 +35,7 @@ function pointerDownPreparing(state: BoardPlayState, {board, event, target}: Act
   } else if (board.planes.filter(p => p.isReady()).length < Board.readyPlaneCount) {
     state.newPlane = state.focusedPlane = generatePlane(blockPos)
   } else {
-    event.currentTarget.releasePointerCapture(event.pointerId)
+    target.releasePointerCapture(event.pointerId)
     // warn user max count
   }
   if (state.focusedPlane) {
@@ -50,9 +50,14 @@ function pointerUpPreparing(state: BoardPlayState, {board, event, target}: Actio
   if (state.focusedPlane) {
     if (state.pressedPos && !state.dragged) {
       // rotate plane
+      const rotatedPlane = state.focusedPlane.clone()
       for (let i = 0; i < Object.values(FighterDirection).length; i++) {
-        state.focusedPlane = state.focusedPlane.rotate(state.pressedPos)
-        if (state.focusedPlane.isReady()) {
+        rotatedPlane.rotate(state.pressedPos)
+        if (rotatedPlane.isReady()) {
+          if (!state.focusedPlane.equals(rotatedPlane)) {
+            state.removePlanes = [state.focusedPlane]
+            state.newPlane = state.focusedPlane = rotatedPlane
+          }
           break
         }
       }
