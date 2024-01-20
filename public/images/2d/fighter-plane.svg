@@ -40,6 +40,17 @@
       opacity: 0.5;
     }
   </style>
+  <defs>
+    <animateTransform
+      href="#blade-right"
+      attributeName="transform"
+      type="scale"
+      values="1 1;0 1;-1 1"
+      dur="0.3s"
+      repeatCount="indefinite"
+      additive="sum"
+    />
+  </defs>
   <g id="outline" visibility="visible">
     <rect id="block" width="100" height="100" fill="none" stroke="rgba(0, 0, 0, 0.5)" x="200" y="0" />
     <use href="#block" y="100" />

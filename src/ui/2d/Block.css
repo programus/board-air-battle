@@ -12,42 +12,40 @@
   background-color: white;
 }
 
-.plane-body {
-  background-color: rgba(0, 0, 0, 0.15);
-}
-
-.hitted-Empty {
-  background-color: rgba(0, 0, 0, 0);
-  z-index: 10;
-}
-
-.hitted-PlaneBody {
-  background-color: rgba(0, 0, 0, 0);
-  z-index: 10;
-}
-
-.hitted-PlaneCore {
-  background-color: rgba(255, 0, 0, 0.7);
-  z-index: 10;
-}
-
-.explode-image {
+.block-layer {
   position: absolute;
-  background-image: url('images/body-hitted.svg');
-  background-size: cover;
   width: 100%;
   height: 100%;
   top: 0;
   left: 0;
-  display: none;
 }
 
-.hitted.explode-image {
-  display: block;
+.plane-body {
+  background-color: rgba(0, 0, 0, 0.15);
 }
 
 .not-ready {
   outline-color: red;
   background-color: rgba(255, 0, 0, 0.5);
   z-index: 10;
+}
+
+.hitted-PlaneBody {
+  background-color: rgba(255, 255, 255, 0.5);
+  z-index: 10;
+}
+
+.hitted-PlaneCore {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.explode-image {
+  display: block;
+  z-index: 10;
+}
+
+.explode-image object {
+  width: 100%;
+  aspect-ratio: 1;
 }

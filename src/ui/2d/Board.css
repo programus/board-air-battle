@@ -12,7 +12,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: cyan;
+  background-image: url(images/2d/board-background.svg);
+  background-size: cover;
 }
 
 .board-row {
