@@ -13,7 +13,7 @@ function App() {
   points.map(v => board.blockAt(v).setHitted(true))
   return (
     <>
-      <BoardTag board={board} width='80vw' />
+      <BoardTag board={board} width='min(80vw, 80vh)' />
       <a href="https://www.vecteezy.com/free-vector/bomb">Bomb Vectors by Vecteezy</a>
     </>
   )

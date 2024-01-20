@@ -31,21 +31,16 @@
 }
 
 .hitted-PlaneBody {
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(127, 127, 127, 0.2);
   z-index: 10;
 }
 
 .hitted-PlaneCore {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(255, 127, 0, 0.4);
   z-index: 10;
 }
 
-.explode-image {
+.hitted-block {
   display: block;
   z-index: 10;
-}
-
-.explode-image object {
-  width: 100%;
-  aspect-ratio: 1;
 }
