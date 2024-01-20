@@ -36,8 +36,34 @@
 }
 
 .hitted-PlaneCore {
-  background-color: rgba(255, 127, 0, 0.4);
-  z-index: 10;
+  /* z-index: 10; */
+}
+
+@keyframes explosion-wave {
+  0% {
+    opacity: 0.2;
+    transform: translate(-25%, -25%) scale(0.5);
+  }
+  20%,75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+    transform: translate(-25%, -25%) scale(1);
+  }
+}
+
+.hitted-PlaneCore::before {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 200%;
+  height: 200%;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 159, 127, 0.7) 40%, rgba(255, 200, 127, 0) 75%);
+  transform: translate(-25%, -25%);
+  animation: explosion-wave 2s ease-out infinite;
 }
 
 .hitted-block {

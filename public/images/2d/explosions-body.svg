@@ -50,32 +50,35 @@
          id="path6286" />
     </clipPath>
 
-   <animate 
-      href="#g0"
-      attributeName="opacity"
-      values="1;1; 0;0; 0;"
-      dur="1.5s"
-      repeatCount="indefinite"
-      calcMode="linear"
-   />
-    <animate 
-      href="#g2"
-      attributeName="opacity"
-      values="0; 1;1; 0; 0;"
-      dur="1.5s"
-      repeatCount="indefinite"
-      calcMode="linear"
-   />
-    <animate 
-      href="#g4"
-      attributeName="opacity"
-      values="0;0; 1;1; 0;"
-      dur="1.5s"
-      repeatCount="indefinite"
-      calcMode="linear"
-   />
-
   </defs>
+
+  <style>
+   @keyframes fadeOut {
+      0% {
+         opacity: 0;
+      }
+      30% {
+         opacity: 1;
+      }
+      50%, 100% {
+         opacity: 0;
+      }
+   }
+
+   #g0 {
+      animation: fadeOut 2s 0s linear infinite;
+   }
+   #g2 {
+      animation: fadeOut 2s -1.533s linear infinite;
+   }
+   #g4 {
+      animation: fadeOut 2s -1.067s linear infinite;
+   }
+   #g6 {
+      animation: fadeOut 2s -0.60s linear infinite;
+   }
+  </style>
+
   <g
      inkscape:groupmode="layer"
      id="layer1"

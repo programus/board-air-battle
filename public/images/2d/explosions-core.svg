@@ -50,44 +50,42 @@
          clip-rule="evenodd"
          id="path6286" />
     </clipPath>
-
-    <animate
-       href="#0"
-       attributeName="opacity"
-       values="1;1; 0;0;0; 0;"
-       dur="1.5s"
-       repeatCount="indefinite"
-       calcMode="linear" />
-    <animate
-       href="#2"
-       attributeName="opacity"
-       values="0; 1;1; 0;0; 0;"
-       dur="1.5s"
-       repeatCount="indefinite"
-       calcMode="linear" />
-    <animate
-       href="#4"
-       attributeName="opacity"
-       values="0;0; 1;1; 0; 0;"
-       dur="1.5s"
-       repeatCount="indefinite"
-       calcMode="linear" />
-    <animate
-       href="#6"
-       attributeName="opacity"
-       values="0;0;0; 1;1; 0;"
-       dur="1.5s"
-       repeatCount="indefinite"
-       calcMode="linear" />
-
   </defs>
+
+  <style>
+   @keyframes fadeOut {
+      0% {
+         opacity: 0;
+      }
+      20% {
+         opacity: 1;
+      }
+      50%, 100% {
+         opacity: 0;
+      }
+   }
+
+   #g0 {
+      animation: fadeOut 2s 0s linear infinite;
+   }
+   #g2 {
+      animation: fadeOut 2s -1.667s linear infinite;
+   }
+   #g4 {
+      animation: fadeOut 2s -1.333s linear infinite;
+   }
+   #g6 {
+      animation: fadeOut 2s -1.00s linear infinite;
+   }
+  </style>
+
   <g
      inkscape:groupmode="layer"
      id="core"
      inkscape:label="core">
     <g
        inkscape:groupmode="layer"
-       id="6"
+       id="g6"
        inkscape:label="6"
        transform="translate(-2273.7691,-573.02608)"
        style="display:inline">
@@ -261,7 +259,7 @@
     </g>
     <g
        inkscape:groupmode="layer"
-       id="4"
+       id="g4"
        inkscape:label="4"
        transform="translate(-773.32271,-576.59761)"
        style="display:inline;opacity:1">
@@ -463,7 +461,7 @@
     </g>
     <g
        inkscape:groupmode="layer"
-       id="2"
+       id="g2"
        inkscape:label="2"
        transform="translate(-2135.7788,56.362863)"
        style="display:inline;opacity:1">
@@ -625,7 +623,7 @@
     </g>
     <g
        inkscape:groupmode="layer"
-       id="0"
+       id="g0"
        inkscape:label="0"
        transform="translate(-176.66068,79.336739)"
        style="display:inline;opacity:1">
