@@ -1,4 +1,4 @@
-import './Board.css'
+import './Board.scss'
 import { Board } from '../../core';
 import { BlockTag } from './BlockTag';
 import { PlanesLayer } from './PlanesLayer';

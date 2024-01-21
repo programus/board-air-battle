@@ -3,7 +3,7 @@ import { Block, HittedType, BoardState } from '../../core'
 import classNames from 'classnames'
 import { isMobile } from 'react-device-detect'
 import 'external-svg-loader'
-import './Block.css'
+import './Block.scss'
 
 interface BlockProps {
   block: Block

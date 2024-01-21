@@ -1,15 +1,22 @@
+$light-color: #fff3;
+$dark-color: #0003;
+$cover-color: #dddd;
+
 .board-block {
   position: relative;
   aspect-ratio: 1;
   width: 100%;
   text-align: center;
-  outline: solid 1px #ccc;
-  outline-offset: -1px;
+  border-collapse: collapse;
+  border-style: solid;
+  border-width: 1px;
+  border-color: $dark-color $light-color $light-color $dark-color ;
   pointer-events: none;
 }
 
 .covered {
-  background-color: white;
+  background-color: $cover-color;
+  border-color: $light-color $dark-color $dark-color $light-color;
 }
 
 .block-layer {
@@ -36,7 +43,7 @@
 }
 
 .hitted-PlaneCore {
-  /* z-index: 10; */
+  z-index: 10;
 }
 
 @keyframes explosion-wave {

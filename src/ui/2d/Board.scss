@@ -1,0 +1,47 @@
+$border-thick: 2em;
+$sky-blue: #66a9e0;
+
+.board-frame {
+  position: relative;
+  border: solid $border-thick #fff1;
+  aspect-ratio: 1;
+  box-shadow: 0 0 1em 0.5em $sky-blue;
+  background-color: $sky-blue;
+  background-image: url(images/2d/board-background.svg);
+  background-size: cover;
+  background-origin: border-box;
+  background-clip: padding-box;
+  border-radius: 1em;
+}
+
+.board-frame::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: -$border-thick;
+  bottom: -$border-thick;
+  left: -$border-thick;
+  right: -$border-thick;
+  border: inherit;
+  border-color: transparent;
+  background: inherit;
+  background-clip: border-box;
+  border-radius: inherit;
+  filter: blur($border-thick * 0.1);
+}
+
+.board {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.board-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
