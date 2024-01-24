@@ -1,6 +1,6 @@
 import './App.css'
 import { Board } from './core'
-import { BoardTag } from './ui/2d/BoardTag'
+import { GameTag } from './ui/2d/GameTag'
 
 
 function App() {
@@ -14,7 +14,7 @@ function App() {
   points.map(v => board.blockAt(v).setHitted(true))
   return (
     <>
-      <BoardTag board={board} width='min(80vw, 80vh)' />
+      <GameTag board={board} />
       <a href="https://www.vecteezy.com/free-vector/bomb">Bomb Vectors by Vecteezy</a>
     </>
   )
