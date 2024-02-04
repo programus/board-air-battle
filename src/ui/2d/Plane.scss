@@ -38,7 +38,7 @@
 
 .plane-not-ready {
   opacity: 0.2;
-  filter: grayscale();
+  filter: grayscale(1);
 }
 
 .moving-plane {

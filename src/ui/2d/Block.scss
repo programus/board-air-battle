@@ -1,6 +1,4 @@
-$light-color: #fff3;
-$dark-color: #0003;
-$cover-color: #dddd;
+@use "var.scss" as *;
 
 .board-block {
   position: relative;
@@ -43,6 +41,7 @@ $cover-color: #dddd;
 }
 
 .hitted-PlaneCore {
+  background-color: rgba(255, 127, 127, 0.3);
   z-index: 10;
 }
 

@@ -6,7 +6,7 @@ import { useCallback, useState } from 'react';
 
 interface BoardProps {
   board: Board,
-  width: string,
+  width?: string,
 }
 
 function BoardTag({board, width}: BoardProps) {
@@ -16,7 +16,7 @@ function BoardTag({board, width}: BoardProps) {
 
   return (
     <>
-      <div className='board-frame' style={{
+      <div className='board-frame main-board' style={{
         width: width,
       }}>
         <div className='board'>

@@ -1,7 +1,7 @@
 import { useEffect, useReducer } from 'react'
 import { Board, BoardState, } from '../../core'
 import { PlaneTag } from './PlaneTag'
-import './Plane.css'
+import './Plane.scss'
 import classNames from 'classnames'
 import { Action, ActionType, BoardPlayState, InteractEvent } from './PlanesLayerDefs'
 import { reducer } from './PlanesLayerReducer'

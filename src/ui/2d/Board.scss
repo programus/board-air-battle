@@ -1,5 +1,4 @@
-$border-thick: 2em;
-$sky-blue: #66a9e0;
+@use "var.scss" as *;
 
 .board-frame {
   position: relative;
@@ -27,7 +26,7 @@ $sky-blue: #66a9e0;
   background: inherit;
   background-clip: border-box;
   border-radius: inherit;
-  filter: blur($border-thick * 0.1);
+  filter: blur($border-thick * 0.25);
 }
 
 .board {

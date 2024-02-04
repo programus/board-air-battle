@@ -1,4 +1,4 @@
-import './Plane.css'
+import './Plane.scss'
 import { FighterDirection, FighterPlane } from '../../core'
 import classNames from 'classnames'
 

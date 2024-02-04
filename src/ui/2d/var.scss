@@ -1,0 +1,7 @@
+@use "sass:color";
+
+$border-thick: 2em;
+$sky-blue: #66a9e0;
+$light-color: #fff3;
+$dark-color: #0003;
+$cover-color: color.adjust($sky-blue, $lightness: 10%, $alpha: -0.1);
