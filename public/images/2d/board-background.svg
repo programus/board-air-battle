@@ -15,7 +15,7 @@
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
      id="defs6">
-     <animateTransform
+     <!-- <animateTransform
       href="#all-clouds"
       attributeName="transform"
       type="translate"
@@ -23,7 +23,7 @@
       to="6666.6665 0"
       dur="120s"
       repeatCount="indefinite"
-     />
+     /> -->
     <clipPath
        clipPathUnits="userSpaceOnUse"
        id="clipPath20">
@@ -337,7 +337,7 @@
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
-  <g id="all-clouds">
+  <g id="all-clouds" transform="translate(3000, 0)">
    <g
       inkscape:groupmode="layer"
       id="clouds"

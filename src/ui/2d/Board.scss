@@ -6,11 +6,26 @@
   aspect-ratio: 1;
   box-shadow: 0 0 1em 0.5em $sky-blue;
   background-color: $sky-blue;
-  background-image: url(images/2d/board-background.svg);
+  background-image: url(/images/2d/board-background.png);
   background-size: cover;
   background-origin: border-box;
   background-clip: padding-box;
+  background-repeat: repeat-x;
   border-radius: 1em;
+  animation-name: board-background-animation;
+  animation-duration: 120s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes board-background-animation {
+  0% {
+    background-position-x: 0%;
+  }
+
+  100% {
+    background-position-x: -100%;
+  }
 }
 
 .board-frame::before {
