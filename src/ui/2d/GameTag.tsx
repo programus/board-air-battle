@@ -1,5 +1,5 @@
-import { useState, useCallback, useRef } from "react";
-import { Board, BoardState } from "../../core";
+import { useState, useRef } from "react";
+import { Board, } from "../../core";
 import { BoardTag } from "./BoardTag";
 import './Game.scss'
 
@@ -54,9 +54,7 @@ function playBgm(audio: CustomAudio, state: GameState) {
 }
 
 function GameTag ({ board }: GamePros) {
-  const [,setUpdate] = useState({})
   const [gameState, setGameState] = useState<GameState>(GameState.Title)
-  const forceUpdate = useCallback(() => setUpdate({}), [])
   const audioRef = useRef<HTMLAudioElement>(null)
   if (audioRef.current) {
     playBgm(audioRef.current as CustomAudio, gameState)
