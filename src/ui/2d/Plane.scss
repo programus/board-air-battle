@@ -14,22 +14,6 @@
   touch-action: none;
 }
 
-.plane-up {
-  transform: translate(-40%, 0) scaleX(-1);
-}
-
-.plane-down {
-  transform: rotate(180deg) translate(40%, 75%);
-}
-
-.plane-left {
-  transform: rotate(-90deg) translate(30%, -12.5%);
-}
-
-.plane-right {
-  transform: rotate(90deg) translate(-30%, 87.5%) scaleX(-1);
-}
-
 .plane-moving {
   cursor: grab;
   opacity: 0.7;

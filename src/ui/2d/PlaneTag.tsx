@@ -8,22 +8,34 @@ interface PlaneProps {
 }
 
 function PlaneTag({plane, notLayoutReady}: PlaneProps) {
-  const directionClassMap = {
-    [FighterDirection.Up]: 'plane-up',
-    [FighterDirection.Down]: 'plane-down',
-    [FighterDirection.Left]: 'plane-left',
-    [FighterDirection.Right]: 'plane-right',
+  let transform = ''
+  switch (plane.dir) {
+    case FighterDirection.Up: {
+      transform = `translate(${plane.pos[0] * 20 - 40}%, ${plane.pos[1] * 25}%) scaleX(-1)`
+      break
+    }
+    case FighterDirection.Down: {
+      transform = `rotate(180deg) translate(${-plane.pos[0] * 20 + 40}%, ${-plane.pos[1] * 25 + 75}%)`
+      break
+    }
+    case FighterDirection.Left: {
+      transform = `rotate(-90deg) translate(${-plane.pos[1] * 20 + 30}%, ${plane.pos[0] * 25 - 12.5}%)`
+      break
+    }
+    case FighterDirection.Right: {
+      transform = `rotate(90deg) translate(${plane.pos[1] * 20 - 30}%, ${-plane.pos[0] * 25 + 87.5}%) scaleX(-1)`
+    }
   }
 
+  console.log(transform)
+
   const tagClasses = classNames({
-    [directionClassMap[plane.dir]]: true,
     'plane-moving': plane.moving,
     'plane-not-ready': !plane.isReady() || notLayoutReady,
   })
   return (
     <div className={tagClasses} style={{
-      left: `${plane.pos[0] * 10}%`,
-      top: `${plane.pos[1] * 10}%`,
+      transform,
     }}> </div>
   )
 }
