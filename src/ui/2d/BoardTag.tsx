@@ -7,11 +7,15 @@ import { useCallback, useState } from 'react';
 interface BoardProps {
   board: Board,
   width?: string,
+  onUpdated?: () => void,
 }
 
-function BoardTag({board, width}: BoardProps) {
+function BoardTag({board, width, onUpdated}: BoardProps) {
   const [,setUpdate] = useState({})
-  const forceUpdate = useCallback(() => setUpdate({}), [])
+  const forceUpdate = useCallback(() => {
+    setUpdate({})
+    onUpdated && onUpdated()
+  }, [onUpdated])
   const blocks = board.blocks
 
   return (

@@ -1,10 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Board, } from "../../core";
 import { BoardTag } from "./BoardTag";
 import './Game.scss'
 
 interface GamePros {
-  board: Board;
 }
 
 enum GameState {
@@ -53,27 +52,46 @@ function playBgm(audio: CustomAudio, state: GameState) {
   }
 }
 
-function GameTag ({ board }: GamePros) {
+function GameTag () {
   const [gameState, setGameState] = useState<GameState>(GameState.Title)
+  const [,setUpdate] = useState({})
+  const forceUpdate = useCallback(() => setUpdate({}), [])
   const audioRef = useRef<HTMLAudioElement>(null)
   if (audioRef.current) {
     playBgm(audioRef.current as CustomAudio, gameState)
+  }
+
+  const selfBoard = useRef(new Board())
+
+  const renderStates = (gameState: GameState) => {
+    let ret = <></>
+    switch (gameState) {
+      case GameState.Title: {
+        ret = (
+          <div>
+            <button onClick={() => setGameState(GameState.Preparing)}>Start</button>
+          </div>
+        )
+        break
+      }
+      case GameState.Preparing: {
+        ret = (
+          <>
+            <BoardTag board={selfBoard.current} onUpdated={forceUpdate} />
+            <button onClick={() => setGameState(GameState.Finding)} disabled={!selfBoard.current.isLayoutReady()}>Ready? Go!</button>
+          </>
+        )
+        break
+      }
+    }
+    return ret
   }
 
   return (
     <div className="game-root">
       <audio ref={audioRef} />
       {
-        gameState == GameState.Title ? 
-          <div>
-            <button onClick={() => setGameState(GameState.Preparing)}>Start</button>
-          </div> : (
-        gameState == GameState.Preparing ?
-          <>
-            <BoardTag board={board} />
-          </> : 
-          <></>
-        )
+        renderStates(gameState)
       }
     </div>
   )
@@ -81,5 +99,6 @@ function GameTag ({ board }: GamePros) {
 
 export {
   type GamePros,
+  GameState,
   GameTag,
 }
