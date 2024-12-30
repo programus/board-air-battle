@@ -16,8 +16,6 @@ class Board {
 
   private static planeStringDelimiter = '|'
 
-  public static allPossible = boards.map(str => Board.generateBoard(str))
-
   private _blocks: Block[][]
   private _planes: FighterPlane[]
   private _guessPlanes: FighterPlane[]
@@ -32,6 +30,11 @@ class Board {
     this._useGuessPlanes = null
     this._state = BoardState.Preparing
     this._enemy = false
+  }
+
+  public static pickRandomBoard(): Board {
+    const index = Math.floor(Math.random() * boards.length)
+    return Board.generateBoard(boards[index])
   }
 
   public static generateBoard(planeString: string): Board {
