@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback } from "react";
-import { Board, } from "../../core";
+import { useState, useRef, useCallback, useMemo } from "react";
+import { Board, BoardState, } from "../../core";
 import { BoardTag } from "./BoardTag";
 import './Game.scss'
 
@@ -54,6 +54,7 @@ function playBgm(audio: CustomAudio, state: GameState) {
 
 function GameTag () {
   const [gameState, setGameState] = useState<GameState>(GameState.Title)
+  const [enemyBoard, setEnemyBoard] = useState<Board>(Board.pickRandomBoard())
   const [,setUpdate] = useState({})
   const forceUpdate = useCallback(() => setUpdate({}), [])
   const audioRef = useRef<HTMLAudioElement>(null)
@@ -61,7 +62,7 @@ function GameTag () {
     playBgm(audioRef.current as CustomAudio, gameState)
   }
 
-  const selfBoard = useRef(new Board())
+  const selfBoard = useMemo(() => new Board(), [])
 
   const renderStates = (gameState: GameState) => {
     let ret = <></>
@@ -77,8 +78,30 @@ function GameTag () {
       case GameState.Preparing: {
         ret = (
           <>
-            <BoardTag board={selfBoard.current} onUpdated={forceUpdate} />
-            <button onClick={() => setGameState(GameState.Finding)} disabled={!selfBoard.current.isLayoutReady()}>Ready? Go!</button>
+            <BoardTag board={selfBoard} onUpdated={forceUpdate} />
+            <button onClick={() => {
+              const enemyBoard = Board.pickRandomBoard()
+              enemyBoard.isEnemy = true
+              enemyBoard.state = BoardState.Fighting
+              setEnemyBoard(enemyBoard)
+              setGameState(GameState.Finding)
+            }} disabled={!selfBoard.isLayoutReady()}>Ready? Go!</button>
+          </>
+        )
+        break
+      }
+      case GameState.Finding: {
+        ret = (
+          <div>
+            <button onClick={() => setGameState(GameState.Fighting)}>Fight!</button>
+          </div>
+        )
+        break
+      }
+      case GameState.Fighting: {
+        ret = (
+          <>
+            <BoardTag board={enemyBoard} />
           </>
         )
         break
