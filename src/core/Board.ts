@@ -111,6 +111,15 @@ class Board {
     this._enemy = v
   }
 
+  public get allPlanesKilled(): boolean {
+    const blocksHitted = this._planes.map(plane => {
+      const [x, y] = plane.pos
+      const block = this._blocks[y][x]
+      return block.isHitted()
+    })
+    return blocksHitted.every(v => v)
+  }
+
   public isLayoutReady(): boolean {
     const planeCountReady = this._planes.length === Board.readyPlaneCount
     const flatBlocks = this._blocks.flat()

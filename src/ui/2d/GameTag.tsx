@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Board, BoardState, } from "../../core";
 import { BoardTag } from "./BoardTag";
 import './Game.scss'
@@ -54,6 +54,7 @@ function playBgm(audio: CustomAudio, state: GameState) {
 
 function GameTag () {
   const [gameState, setGameState] = useState<GameState>(GameState.Title)
+  const [selfBoard, setSelfBoard] = useState<Board>(new Board())
   const [enemyBoard, setEnemyBoard] = useState<Board>(Board.pickRandomBoard())
   const [,setUpdate] = useState({})
   const forceUpdate = useCallback(() => setUpdate({}), [])
@@ -62,15 +63,17 @@ function GameTag () {
     playBgm(audioRef.current as CustomAudio, gameState)
   }
 
-  const selfBoard = useMemo(() => new Board(), [])
-
   const renderStates = (gameState: GameState) => {
     let ret = <></>
     switch (gameState) {
       case GameState.Title: {
         ret = (
           <div>
-            <button onClick={() => setGameState(GameState.Preparing)}>Start</button>
+            <button onClick={() => {
+              selfBoard.cleanPlanes()
+              setSelfBoard(selfBoard)
+              setGameState(GameState.Preparing)
+            }}>Start</button>
           </div>
         )
         break
@@ -101,8 +104,30 @@ function GameTag () {
       case GameState.Fighting: {
         ret = (
           <>
-            <BoardTag board={enemyBoard} />
+            <BoardTag board={enemyBoard} onUpdated={() => {
+              if (enemyBoard.allPlanesKilled) {
+                enemyBoard.state = BoardState.Over
+                setEnemyBoard(enemyBoard)
+                setGameState(GameState.End)
+              }
+            }} />
+            <label>
+              Analyzing
+              <input type="checkbox" onChange={(e) => {
+                enemyBoard.state = e.target.checked ? BoardState.Analyzing : BoardState.Fighting;
+                setEnemyBoard(enemyBoard)
+              }} />
+            </label>
           </>
+        )
+        break
+      }
+      case GameState.End: {
+        ret = (
+          <div>
+            <BoardTag board={enemyBoard} />
+            <button onClick={() => setGameState(GameState.Title)}>Restart</button>
+          </div>
         )
         break
       }
