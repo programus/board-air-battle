@@ -16,6 +16,8 @@ class Board {
 
   private static planeStringDelimiter = '|'
 
+  public static allPossible: Board[] = Board.backgroundGenerateAllPossibleBoards(100)
+
   private _blocks: Block[][]
   private _planes: FighterPlane[]
   private _guessPlanes: FighterPlane[]
@@ -30,6 +32,36 @@ class Board {
     this._useGuessPlanes = null
     this._state = BoardState.Preparing
     this._enemy = false
+  }
+  
+  /**
+   * Generates all possible boards in the background, in chunks of the specified size.
+   * 
+   * This method generates boards in chunks to avoid blocking the main thread. It continues
+   * generating boards until all possible boards are generated. The generated boards are stored
+   * in the static `Board.allPossible` array.
+   * 
+   * @param size - The number of boards to generate in each chunk.
+   * @returns An array of all possible boards.
+   */
+  private static backgroundGenerateAllPossibleBoards(size: number): Board[] {
+    if (!Board.allPossible) {
+      Board.allPossible = []
+    }
+    const boardsChunk = boards.slice(Board.allPossible.length, Board.allPossible.length + size)
+    Board.allPossible.push(...boardsChunk.map(str => Board.generateBoard(str)))
+    if (Board.allPossible.length < boards.length) {
+      setTimeout(() => {
+        Board.backgroundGenerateAllPossibleBoards(size)
+      }, 0)
+    } else {
+      console.log('All possible boards generated')
+    }
+    return Board.allPossible
+  }
+  
+  public static allPossibleBoardsGenerated(): boolean {
+    return Board.allPossible.length === boards.length
   }
 
   public static pickRandomBoard(): Board {
