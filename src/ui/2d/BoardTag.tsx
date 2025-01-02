@@ -8,6 +8,7 @@ interface BoardProps {
   board: Board,
   width?: string,
   onUpdated?: () => void,
+  turnCount?: number,
 }
 
 function BoardTag({board, width, onUpdated}: BoardProps) {

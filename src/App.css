@@ -1,0 +1,11 @@
+.references {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  font-size: xx-small;
+  opacity: 0.5;
+}
+
+.references:hover {
+  opacity: 1;
+}

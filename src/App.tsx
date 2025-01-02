@@ -7,8 +7,10 @@ function App() {
   return (
     <>
       <GameTag />
-      <a href="https://www.vecteezy.com/free-vector/bomb">Bomb Vectors by Vecteezy</a>|
-      <a href="https://www.vecteezy.com/free-vector/sky-clouds">Sky Clouds Vectors by Vecteezy</a>
+      <div className='references'>
+        <a href="https://www.vecteezy.com/free-vector/bomb">Bomb Vectors by Vecteezy</a>|
+        <a href="https://www.vecteezy.com/free-vector/sky-clouds">Sky Clouds Vectors by Vecteezy</a>
+      </div>
     </>
   )
 }

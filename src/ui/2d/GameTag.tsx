@@ -2,6 +2,8 @@ import { useState, useRef, useCallback } from "react";
 import { Board, BoardState, } from "../../core";
 import { BoardTag } from "./BoardTag";
 import './Game.scss'
+import classNames from "classnames"
+import { AiPlayer } from "../../core/ai"
 
 interface GamePros {
 }
@@ -56,90 +58,125 @@ function GameTag () {
   const [gameState, setGameState] = useState<GameState>(GameState.Title)
   const [selfBoard, setSelfBoard] = useState<Board>(new Board())
   const [enemyBoard, setEnemyBoard] = useState<Board>(Board.pickRandomBoard())
+  const [gameTurn, setGameTurn] = useState(0)
+  const [enemyMovingState, setEnemyMovingState] = useState<'moved'|'moving'>('moved')
   const [,setUpdate] = useState({})
   const forceUpdate = useCallback(() => setUpdate({}), [])
+  const aiPlayer = useRef(new AiPlayer())
+
   const audioRef = useRef<HTMLAudioElement>(null)
   if (audioRef.current) {
     playBgm(audioRef.current as CustomAudio, gameState)
   }
 
-  const renderStates = (gameState: GameState) => {
-    let ret = <></>
-    switch (gameState) {
-      case GameState.Title: {
-        ret = (
-          <div>
-            <button onClick={() => {
-              selfBoard.cleanPlanes()
-              setSelfBoard(selfBoard)
-              setGameState(GameState.Preparing)
-            }}>Start</button>
-          </div>
-        )
-        break
-      }
-      case GameState.Preparing: {
-        ret = (
-          <>
-            <BoardTag board={selfBoard} onUpdated={forceUpdate} />
-            <button onClick={() => {
-              const enemyBoard = Board.pickRandomBoard()
-              enemyBoard.isEnemy = true
-              enemyBoard.state = BoardState.Fighting
-              setEnemyBoard(enemyBoard)
-              setGameState(GameState.Finding)
-            }} disabled={!selfBoard.isLayoutReady()}>Ready? Go!</button>
-          </>
-        )
-        break
-      }
-      case GameState.Finding: {
-        ret = (
-          <div>
-            <button onClick={() => setGameState(GameState.Fighting)}>Fight!</button>
-          </div>
-        )
-        break
-      }
-      case GameState.Fighting: {
-        ret = (
-          <>
-            <BoardTag board={enemyBoard} onUpdated={() => {
-              if (enemyBoard.allPlanesKilled) {
-                enemyBoard.state = BoardState.Over
-                setEnemyBoard(enemyBoard)
-                setGameState(GameState.End)
-              }
-            }} />
-            <label>
-              Analyzing
-              <input type="checkbox" onChange={(e) => {
-                enemyBoard.state = e.target.checked ? BoardState.Analyzing : BoardState.Fighting;
-                setEnemyBoard(enemyBoard)
-              }} />
-            </label>
-          </>
-        )
-        break
-      }
-      case GameState.End: {
-        ret = (
-          <div>
-            <BoardTag board={enemyBoard} />
-            <button onClick={() => setGameState(GameState.Title)}>Restart</button>
-          </div>
-        )
-        break
-      }
+  if (gameState === GameState.Finding) {
+    if (Board.allPossibleBoardsGenerated()) {
+      setGameState(GameState.Fighting)
+      aiPlayer.current.init()
+    } else {
+      // wait until all possible boards are generated
+      setTimeout(() => {
+        setUpdate({})
+      }, 0)
     }
-    return ret
   }
+
+  const GameTitle = useCallback(() => {
+    return (
+      <div>
+        <h1>Plane War</h1>
+        <p>Click Start to begin</p>
+        <button
+          onClick={() => {
+            setSelfBoard(new Board())
+            setGameState(GameState.Preparing)
+          }}
+        >Start</button>
+      </div>
+    )
+  }, [setSelfBoard, setGameState])
+  
+  const GameOngoing = useCallback(() => {
+    const enemyClassName = classNames({
+      'enemy-preparing': gameState === GameState.Preparing,
+      'enemy-playing': gameState !== GameState.Preparing,
+    })
+    const selfClassName = classNames({
+      'self-preparing': gameState === GameState.Preparing,
+      'self-playing': gameState !== GameState.Preparing,
+    })
+    return (
+      <div className="board-container">
+        <div className="game-control">
+          {
+            gameState === GameState.Preparing ? (
+              <button
+                onClick={() => {
+                  const enemyBoard = Board.pickRandomBoard()
+                  enemyBoard.isEnemy = true
+                  enemyBoard.state = BoardState.Fighting
+                  setEnemyBoard(enemyBoard)
+                  selfBoard.state = BoardState.Over
+                  aiPlayer.current.opponentBoard = selfBoard
+                  setSelfBoard(selfBoard)
+                  setGameState(GameState.Finding)
+                }}
+                disabled={!selfBoard.isLayoutReady()}
+              >Ready? Go!</button>
+            ) : gameState === GameState.Fighting ? (
+              <label>
+                Analyzing
+                <input type="checkbox" onChange={(e) => {
+                  enemyBoard.state = e.target.checked ? BoardState.Analyzing : BoardState.Fighting;
+                  setEnemyBoard(enemyBoard)
+                }} />
+              </label>
+            ) : gameState === GameState.End ? (
+              <button onClick={() => setGameState(GameState.Title)}>Restart</button>
+            ) : (
+              <></>
+            )
+          }
+        </div>
+        <div className={enemyClassName}>
+          <BoardTag board={enemyBoard} onUpdated={() => {
+            // it's turn for enemy moving after self's turn
+            switch (gameState) {
+              case GameState.Fighting: {
+                if (enemyBoard.state === BoardState.Fighting && enemyMovingState === 'moved') {
+                  const turnCount = enemyBoard.blocks.flat().filter(b => b.isHitted()).length
+                  setEnemyMovingState('moving')
+                  aiPlayer.current.playTurn(turnCount)
+                  setGameTurn(turnCount)
+                  console.log('%c%s', 'color: #88f;', selfBoard.toString())
+                  setEnemyMovingState('moved')
+                }
+                if (enemyBoard.allPlanesKilled || selfBoard.allPlanesKilled) {
+                  enemyBoard.state = BoardState.Over
+                  setEnemyBoard(enemyBoard)
+                  setGameState(GameState.End)
+                }
+              }
+              break
+            }
+          }} />
+        </div>
+        <div className={selfClassName}>
+          <BoardTag board={selfBoard} onUpdated={gameState === GameState.Preparing ? forceUpdate : undefined} turnCount={gameTurn} />
+        </div>
+      </div>
+    )
+  }, [gameState, selfBoard, enemyBoard, forceUpdate, setEnemyBoard, setGameState, enemyMovingState, aiPlayer, gameTurn])
 
   return (
     <div className="game-root">
       <audio ref={audioRef} />
       {
-        renderStates(gameState)
+        gameState === GameState.Title ? (
+          <GameTitle />
+        ) : (
+          GameOngoing()
+        )
       }
     </div>
   )

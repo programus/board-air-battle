@@ -27,7 +27,7 @@ function PlaneTag({plane, notLayoutReady}: PlaneProps) {
     }
   }
 
-  console.log(transform)
+  // console.log(transform)
 
   const tagClasses = classNames({
     'plane-moving': plane.moving,

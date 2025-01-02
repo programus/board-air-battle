@@ -5,3 +5,5 @@ $sky-blue: #66a9e0;
 $light-color: #fff3;
 $dark-color: #0003;
 $cover-color: color.adjust($sky-blue, $lightness: 10%, $alpha: -0.1);
+
+$game-transition: all 0.5s ease-in-out;
