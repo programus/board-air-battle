@@ -95,7 +95,7 @@ function GameTag () {
       </div>
     )
   }, [setSelfBoard, setGameState])
-  
+
   const GameOngoing = useCallback(() => {
     const enemyClassName = classNames({
       'enemy-preparing': gameState === GameState.Preparing,
@@ -129,6 +129,7 @@ function GameTag () {
                 <input type="checkbox" onChange={(e) => {
                   enemyBoard.state = e.target.checked ? BoardState.Analyzing : BoardState.Fighting;
                   setEnemyBoard(enemyBoard)
+                  setUpdate({})
                 }} />
               </label>
             ) : gameState === GameState.End ? (

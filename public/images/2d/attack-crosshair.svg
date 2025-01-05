@@ -1,0 +1,37 @@
+<svg width="110" height="110" viewBox="-55 -55 110 110" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="circle-fill">
+      <stop offset="30%" stop-color="#ffdd6610" />
+      <stop offset="50%" stop-color="#ffdd6660" />
+      <stop offset="80%" stop-color="#ffdd6600" />
+      <stop offset="81%" stop-color="#ff666600" />
+      <stop offset="92%" stop-color="#ff666660" />
+    </radialGradient>
+  </defs>
+  <rect width="110" height="110" x="-55" y="-55" stroke="none" fill="#ff000010">
+    <animate attributeName="fill" values="#ff000000;#ff000010;#ff000000" dur="2s" repeatCount="indefinite" />
+  </rect>
+  <g id="crosshair">
+    <g id="crossline" stroke="#0f0" stroke-width="2">
+      <line x1="0" x2="0" y1="-20" y2="-70" />
+      <line x1="0" y1="0" x2="0" y2="-10" />
+    </g>
+    <use href="#crossline" transform="rotate(90 0 0)"/>
+    <use href="#crossline" transform="rotate(180 0 0)"/>
+    <use href="#crossline" transform="rotate(270 0 0)"/>
+  </g>
+  <g>
+    <circle cx="0" cy="0" r="50" stroke="#cc3333" stroke-width="4" fill="url(#circle-fill)" />
+    <polygon id="triangle" points="0,-35 -5,-50 0,-50 5,-50" fill="#cc3333" transform="rotate(0 50 50)">
+      <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="2.8s" repeatCount="indefinite"/>
+    </polygon>
+    <use href="#triangle" transform="rotate(90 0 0)"/>
+    <use href="#triangle" transform="rotate(180 0 0)"/>
+    <use href="#triangle" transform="rotate(270 0 0)"/>
+    <circle cx="0" cy="0" r="30" stroke="#ffff00" stroke-width="2" fill="none">
+    </circle>
+
+    <animateTransform attributeName="transform" type="scale" values="0.9;1;0.9" dur="2s" repeatCount="indefinite" />
+  </g>
+  <use href="#crosshair" opacity="0.4" />
+</svg>

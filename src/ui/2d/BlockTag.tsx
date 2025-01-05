@@ -13,7 +13,9 @@ function BlockTag({block}: BlockProps) {
   const rotation =  useMemo(() => Math.random() * 360, [])
   const blockClass = classNames({
     'board-block': true,
-    'covered': [BoardState.Analyzing, BoardState.Fighting].includes(block.owner.state) && !block.isHitted(),
+    'pointer-events-through': [BoardState.Preparing, BoardState.Over, BoardState.Analyzing].includes(block.owner.state),
+    'covered': [BoardState.Fighting].includes(block.owner.state) && !block.isHitted(),
+    'analyzing-covered': BoardState.Analyzing === block.owner.state && !block.isHitted(),
   })
   const planeClass = classNames({
     'block-layer': true,
@@ -53,7 +55,7 @@ function BlockTag({block}: BlockProps) {
   )
 }
 
-export { 
+export {
   BlockTag,
   type BlockProps,
 }

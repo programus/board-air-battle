@@ -9,12 +9,37 @@
   border-style: solid;
   border-width: 1px;
   border-color: $dark-color $light-color $light-color $dark-color ;
+}
+
+@media (pointer:none), (pointer:coarse) {
+  .board-block {
+    pointer-events: none;
+  }
+}
+
+.pointer-events-through {
   pointer-events: none;
 }
 
 .covered {
   background-color: $cover-color;
   border-color: $light-color $dark-color $dark-color $light-color;
+}
+
+.analyzing-covered {
+  background-color: $analyzing-cover-color;
+  border-color: $light-color $dark-color $dark-color $light-color;
+}
+
+@media (hover:hover) {
+  .covered:hover {
+    background-image: url(/images/2d/attack-crosshair.svg);
+    background-size: contain;
+  }
+
+  .covered:active {
+    pointer-events: none;
+  }
 }
 
 .block-layer {
