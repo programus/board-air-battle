@@ -2,6 +2,29 @@ import { Block, HittedType } from './Block'
 import { FighterPlane, FighterDirection } from './FighterPlane';
 import { Board, BoardState } from './Board'
 
+
+const hittedSoundMap = {
+  [HittedType.NotHitted]: null,
+  [HittedType.Empty]: new Audio('sounds/hit-empty.mp3'),
+  [HittedType.PlaneBody]: new Audio('sounds/hit-body.mp3'),
+  [HittedType.PlaneCore]: new Audio('sounds/hit-core.mp3'),
+}
+
+
+function playEffect(hittedType: HittedType, volume?: number) {
+  const audio = hittedSoundMap[hittedType]
+  if (audio) {
+    if (!audio.paused) {
+      audio.pause()
+      audio.currentTime = 0
+    }
+    audio.volume = volume || 1
+    audio.play()
+    console.log('playEffect', hittedType)
+  }
+}
+
+
 function areArrayEqual<T>(...aa: T[][]): boolean {
   let ret = true
   if (aa.length > 1) {
@@ -32,6 +55,7 @@ function shuffle<T>(array: T[], inplace?: boolean): T[] {
 }
 
 export {
+  playEffect,
   areArrayEqual,
   shuffle,
   HittedType,

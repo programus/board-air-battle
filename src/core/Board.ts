@@ -19,6 +19,8 @@ class Board {
 
   public static allPossible: Board[] = Board.backgroundGenerateAllPossibleBoards(100)
 
+  public static placeholder = new Board()
+
   private _blocks: Block[][]
   private _planes: FighterPlane[]
   private _guessPlanes: FighterPlane[]
@@ -66,6 +68,7 @@ class Board {
   }
 
   public static pickRandomBoard(): Board {
+    console.log('%c%s', 'background: green', 'Picking random board')
     const index = Math.floor(Math.random() * boards.length)
     return Board.generateBoard(boards[index])
   }

@@ -1,6 +1,5 @@
-import { shuffle } from "."
+import { HittedType, shuffle } from "."
 import { Board } from "./Board"
-
 
 class AiPlayer {
   private _possibleBoards: Board[] = []
@@ -57,11 +56,11 @@ class AiPlayer {
     return pos as [number, number]
   }
 
-  playTurn(turnCount: number): number {
+  playTurn(turnCount: number, callback: (ai: AiPlayer, hittedType: HittedType) => void): number {
     let count = 0
     for (; this._turnCount < turnCount; this._turnCount++) {
       const guessedBoard = this._possibleBoards[0]
-      const isCheating = Math.random() < this._intellegentLevel - 1
+      const isCheating = this._intellegentLevel >= 2 && Math.random() < (this._intellegentLevel - 1) / 2
       console.log('%c%s%s', 'background: red;', 'AI is cheating:', isCheating)
       console.log('%c%s%d', 'background: #f88;', 'remain: ', this.possibleBoards.length)
       const pos = (isCheating ? this.opponentBoard?.planes.find(plane => !this._hittedPosSet.has(plane.pos.join(',')))?.pos : guessedBoard.planes.find(plane => !this._hittedPosSet.has(plane.pos.join(',')))?.pos) || this.generateRandomPos()
@@ -78,6 +77,9 @@ class AiPlayer {
         }
         return ret
       })
+      if (callback) {
+        callback(this, feedback!)
+      }
       count++
     }
     return count

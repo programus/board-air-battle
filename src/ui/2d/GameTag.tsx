@@ -1,10 +1,11 @@
 import { useState, useRef, useCallback } from "react";
-import { Board, BoardState, } from "../../core";
+import { Board, BoardState, playEffect } from "../../core";
 import { BoardTag } from "./BoardTag";
 import './Game.scss'
 import classNames from "classnames"
 import { AiPlayer } from "../../core/ai"
 import AiLevelSelector from "./AiLevelSelector"
+import { boards } from "../../core/boards"
 
 interface GamePros {
 }
@@ -18,7 +19,7 @@ enum GameState {
 }
 
 type CustomAudio = HTMLAudioElement & {
-  state: GameState|undefined, 
+  state: GameState|undefined,
   file: string|undefined,
 }
 
@@ -57,9 +58,10 @@ function playBgm(audio: CustomAudio, state: GameState) {
 
 function GameTag () {
   const [gameState, setGameState] = useState<GameState>(GameState.Title)
-  const [selfBoard, setSelfBoard] = useState<Board>(new Board())
-  const [enemyBoard, setEnemyBoard] = useState<Board>(Board.pickRandomBoard())
+  const [selfBoard, setSelfBoard] = useState<Board>(Board.placeholder)
+  const [enemyBoard, setEnemyBoard] = useState<Board>(Board.placeholder)
   const [gameTurn, setGameTurn] = useState(0)
+  const [hitTurn, setHitTurn] = useState(0)
   const [enemyMovingState, setEnemyMovingState] = useState<'moved'|'moving'>('moved')
   const [,setUpdate] = useState({})
   const forceUpdate = useCallback(() => setUpdate({}), [])
@@ -72,8 +74,16 @@ function GameTag () {
 
   if (gameState === GameState.Finding) {
     if (Board.allPossibleBoardsGenerated()) {
-      setGameState(GameState.Fighting)
+      const enemyBoard = Board.pickRandomBoard()
+      enemyBoard.isEnemy = true
+      enemyBoard.state = BoardState.Fighting
+      setEnemyBoard(enemyBoard)
+      selfBoard.state = BoardState.Watching
+      setSelfBoard(selfBoard)
+
+      aiPlayer.current.opponentBoard = selfBoard
       aiPlayer.current.init()
+      setGameState(GameState.Fighting)
     } else {
       // wait until all possible boards are generated
       setTimeout(() => {
@@ -99,13 +109,15 @@ function GameTag () {
   }, [setSelfBoard, setGameState])
 
   const GameOngoing = useCallback(() => {
+    const preparingStates = new Set([GameState.Preparing, GameState.Finding])
+    const isPreparing = preparingStates.has(gameState)
     const enemyClassName = classNames({
-      'enemy-preparing': gameState === GameState.Preparing,
-      'enemy-playing': gameState !== GameState.Preparing,
+      'enemy-preparing': isPreparing,
+      'enemy-playing': !isPreparing,
     })
     const selfClassName = classNames({
-      'self-preparing': gameState === GameState.Preparing,
-      'self-playing': gameState !== GameState.Preparing,
+      'self-preparing': isPreparing,
+      'self-playing': !isPreparing,
     })
     return (
       <div className="board-container">
@@ -115,13 +127,6 @@ function GameTag () {
               <div>
                 <button
                   onClick={() => {
-                    const enemyBoard = Board.pickRandomBoard()
-                    enemyBoard.isEnemy = true
-                    enemyBoard.state = BoardState.Fighting
-                    setEnemyBoard(enemyBoard)
-                    selfBoard.state = BoardState.Watching
-                    aiPlayer.current.opponentBoard = selfBoard
-                    setSelfBoard(selfBoard)
                     setGameState(GameState.Finding)
                   }}
                   disabled={!selfBoard.isLayoutReady()}
@@ -130,13 +135,15 @@ function GameTag () {
                   onClick={() => setSelfBoard(Board.pickRandomBoard())}
                 >Pick a random board for me.</button>
               </div>
+            ) : gameState === GameState.Finding ? (
+              <div>Waiting for AI opponent finishing preparing... { (Board.allPossible.length * 100 / boards.length).toFixed(0) }%</div>
             ) : gameState === GameState.Fighting ? (
               <label>
                 Analyzing
-                <input type="checkbox" onChange={(e) => {
+                <input type="checkbox" checked={enemyBoard.state === BoardState.Analyzing} onChange={(e) => {
                   enemyBoard.state = e.target.checked ? BoardState.Analyzing : BoardState.Fighting;
                   setEnemyBoard(enemyBoard)
-                  setUpdate({})
+                  forceUpdate()
                 }} />
               </label>
             ) : gameState === GameState.End ? (
@@ -147,22 +154,36 @@ function GameTag () {
           }
         </div>
         <div className={enemyClassName}>
-          <BoardTag board={enemyBoard} onUpdated={() => {
+          <BoardTag board={enemyBoard} turnCount={hitTurn} onUpdated={() => {
             // it's turn for enemy moving after self's turn
             switch (gameState) {
               case GameState.Fighting: {
                 if (enemyBoard.state === BoardState.Fighting && enemyMovingState === 'moved') {
                   const turnCount = enemyBoard.blocks.flat().filter(b => b.isHitted()).length
-                  setEnemyMovingState('moving')
-                  aiPlayer.current.playTurn(turnCount)
-                  setGameTurn(turnCount)
-                  console.log('%c%s', 'color: #88f;', selfBoard.toString())
-                  setEnemyMovingState('moved')
-                }
-                if (enemyBoard.allPlanesKilled || selfBoard.allPlanesKilled) {
-                  enemyBoard.state = BoardState.Over
-                  setEnemyBoard(enemyBoard)
-                  setGameState(GameState.End)
+                  const count = aiPlayer.current.playTurn(turnCount, (ai, hittedType) => {
+                    // simulate ai thinking time
+                    setTimeout(() => {
+                      console.log('%c%s', 'color: red', enemyBoard.toString())
+                      enemyBoard.state = BoardState.Fighting
+                      setEnemyBoard(enemyBoard)
+                      console.log('%c%s', 'color: red', enemyBoard.toString())
+                      playEffect(hittedType, 0.6)
+                      setGameTurn(ai.turnCount)
+                      setEnemyMovingState('moved')
+
+                      if (enemyBoard.allPlanesKilled || selfBoard.allPlanesKilled) {
+                        enemyBoard.state = BoardState.Over
+                        setEnemyBoard(enemyBoard)
+                        setGameState(GameState.End)
+                      }
+                    }, Math.random() * 5000 + 500)
+                  })
+                  if (count > 0) {
+                    setEnemyMovingState('moving')
+                    enemyBoard.state = BoardState.Analyzing
+                    setHitTurn(turnCount)
+                    console.log('%c%s', 'color: #88f;', selfBoard.toString())
+                  }
                 }
               }
               break
@@ -174,7 +195,7 @@ function GameTag () {
         </div>
       </div>
     )
-  }, [gameState, selfBoard, enemyBoard, forceUpdate, setEnemyBoard, setGameState, enemyMovingState, aiPlayer, gameTurn])
+  }, [gameState, selfBoard, enemyBoard, forceUpdate, setEnemyBoard, setGameState, enemyMovingState, aiPlayer, gameTurn, hitTurn])
 
   return (
     <div className="game-root">

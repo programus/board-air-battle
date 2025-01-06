@@ -1,12 +1,5 @@
-import { Board, FighterPlane, FighterDirection, areArrayEqual, HittedType } from "../../core";
+import { Board, FighterPlane, FighterDirection, areArrayEqual, playEffect } from "../../core";
 import { InteractEvent, BoardPlayState, Action, ActionType, HTMLElementType } from "./PlanesLayerDefs";
-
-const hittedSoundMap = {
-  [HittedType.NotHitted]: null,
-  [HittedType.Empty]: new Audio('sounds/hit-empty.mp3'),
-  [HittedType.PlaneBody]: new Audio('sounds/hit-body.mp3'),
-  [HittedType.PlaneCore]: new Audio('sounds/hit-core.mp3'),
-}
 
 function getBlockPosFromEvent(e: InteractEvent, target: HTMLElementType): [x: number, y: number] {
     const rect = target.getBoundingClientRect()
@@ -108,14 +101,7 @@ function pointerUpFighting(state: BoardPlayState, {board, event, target}: Action
   const block = board.blockAt(blockPos)
   const hasBeenHitted = block.setHitted(true)
   if (!hasBeenHitted) {
-    const sound = hittedSoundMap[block.hittedType]
-    if (sound) {
-      if (!sound.paused) {
-        sound.pause()
-        sound.currentTime = 0
-      }
-      sound.play()
-    }
+    playEffect(block.hittedType)
   }
   return {...state}
 }
@@ -125,7 +111,7 @@ function reducer(state: BoardPlayState, action: Action): BoardPlayState {
   const { type, event } = action
   const eventType = event.type.toLowerCase()
   switch (type) {
-    case ActionType.PreparingAction: 
+    case ActionType.PreparingAction:
     case ActionType.AnalyzingAction: {
       const func = {
         pointerdown: pointerDownPreparing,
