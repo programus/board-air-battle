@@ -27,6 +27,7 @@ class Board {
   private _useGuessPlanes: boolean|null
   private _state: BoardState
   private _enemy: boolean
+  private _locked: boolean
 
   constructor(planes?: FighterPlane[]) {
     this._blocks = [...Array(Board.height)].map((_, y) => [...Array(Board.width)].map((_, x) => new Block(this, [x, y])))
@@ -35,6 +36,7 @@ class Board {
     this._useGuessPlanes = null
     this._state = BoardState.Preparing
     this._enemy = false
+    this._locked = false
   }
 
   /**
@@ -145,6 +147,13 @@ class Board {
   }
   public set isEnemy(v: boolean) {
     this._enemy = v
+  }
+
+  public get isLocked(): boolean {
+    return this._locked
+  }
+  public set isLocked(v: boolean) {
+    this._locked = v
   }
 
   public get allPlanesKilled(): boolean {

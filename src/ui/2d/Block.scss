@@ -26,6 +26,10 @@
   border-color: $light-color $dark-color $dark-color $light-color;
 }
 
+.locked {
+  filter: saturate(0.2);
+}
+
 .analyzing-covered {
   background-color: $analyzing-cover-color;
   border-color: $light-color $dark-color $dark-color $light-color;
@@ -40,6 +44,10 @@
   .covered:hover {
     background-image: url(/images/2d/attack-crosshair.svg);
     background-size: contain;
+  }
+
+  .locked:hover {
+    background-image: none;
   }
 
   .covered:active {

@@ -97,11 +97,13 @@ function pointerMovePreparing(state: BoardPlayState, {event, target}: Action): B
 }
 
 function pointerUpFighting(state: BoardPlayState, {board, event, target}: Action): BoardPlayState {
-  const blockPos = getBlockPosFromEvent(event, target)
-  const block = board.blockAt(blockPos)
-  const hasBeenHitted = block.setHitted(true)
-  if (!hasBeenHitted) {
-    playEffect(block.hittedType)
+  if (!board.isLocked) {
+    const blockPos = getBlockPosFromEvent(event, target)
+    const block = board.blockAt(blockPos)
+    const hasBeenHitted = block.setHitted(true)
+    if (!hasBeenHitted) {
+      playEffect(block.hittedType)
+    }
   }
   return {...state}
 }

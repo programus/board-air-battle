@@ -164,7 +164,7 @@ function GameTag () {
                     // simulate ai thinking time
                     setTimeout(() => {
                       console.log('%c%s', 'color: red', enemyBoard.toString())
-                      enemyBoard.state = BoardState.Fighting
+                      enemyBoard.isLocked = false
                       setEnemyBoard(enemyBoard)
                       console.log('%c%s', 'color: red', enemyBoard.toString())
                       playEffect(hittedType, 0.6)
@@ -180,7 +180,7 @@ function GameTag () {
                   })
                   if (count > 0) {
                     setEnemyMovingState('moving')
-                    enemyBoard.state = BoardState.Analyzing
+                    enemyBoard.isLocked = true
                     setHitTurn(turnCount)
                     console.log('%c%s', 'color: #88f;', selfBoard.toString())
                   }
