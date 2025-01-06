@@ -1,0 +1,19 @@
+.ai-level-selector {
+  display: flex;
+  flex-direction: column;
+}
+
+.noto-color-emoji-regular {
+  font-family: "Noto Color Emoji", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.level-text {
+  font-size: 4.5em;
+  margin: 0.5em;
+}
+
+.ai-level-selector input {
+  width: 100%;
+}

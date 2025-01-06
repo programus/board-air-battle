@@ -56,7 +56,7 @@ function PlanesLayer({board, onUpdated}: PlanesLayerProp) {
   })
   const planeReadiness = board.getPlaneReadiness()
   return (
-    <div 
+    <div
       className={classNames(classes)}
       onPointerDown={handlePointerEvents}
       onPointerUp={handlePointerEvents}

@@ -4,6 +4,7 @@ import { BoardTag } from "./BoardTag";
 import './Game.scss'
 import classNames from "classnames"
 import { AiPlayer } from "../../core/ai"
+import AiLevelSelector from "./AiLevelSelector"
 
 interface GamePros {
 }
@@ -85,6 +86,7 @@ function GameTag () {
     return (
       <div>
         <h1>Plane War</h1>
+        <AiLevelSelector aiPlayer={aiPlayer.current} />
         <p>Click Start to begin</p>
         <button
           onClick={() => {
@@ -110,19 +112,24 @@ function GameTag () {
         <div className="game-control">
           {
             gameState === GameState.Preparing ? (
-              <button
-                onClick={() => {
-                  const enemyBoard = Board.pickRandomBoard()
-                  enemyBoard.isEnemy = true
-                  enemyBoard.state = BoardState.Fighting
-                  setEnemyBoard(enemyBoard)
-                  selfBoard.state = BoardState.Watching
-                  aiPlayer.current.opponentBoard = selfBoard
-                  setSelfBoard(selfBoard)
-                  setGameState(GameState.Finding)
-                }}
-                disabled={!selfBoard.isLayoutReady()}
-              >Ready? Go!</button>
+              <div>
+                <button
+                  onClick={() => {
+                    const enemyBoard = Board.pickRandomBoard()
+                    enemyBoard.isEnemy = true
+                    enemyBoard.state = BoardState.Fighting
+                    setEnemyBoard(enemyBoard)
+                    selfBoard.state = BoardState.Watching
+                    aiPlayer.current.opponentBoard = selfBoard
+                    setSelfBoard(selfBoard)
+                    setGameState(GameState.Finding)
+                  }}
+                  disabled={!selfBoard.isLayoutReady()}
+                >Ready? Go!</button>
+                <button
+                  onClick={() => setSelfBoard(Board.pickRandomBoard())}
+                >Pick a random board for me.</button>
+              </div>
             ) : gameState === GameState.Fighting ? (
               <label>
                 Analyzing
