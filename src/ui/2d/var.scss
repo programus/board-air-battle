@@ -6,5 +6,6 @@ $light-color: #fff3;
 $dark-color: #0003;
 $cover-color: color.adjust($sky-blue, $lightness: 10%, $alpha: -0.1);
 $analyzing-cover-color: color.adjust($sky-blue, $hue: 150deg, $saturation: -50%, $lightness: 10%, $alpha: -0.1);
+$watching-cover-color: color.adjust($sky-blue, $hue: 180deg, $saturation: -60%, $lightness: -80%, $alpha: -0.7);
 
 $game-transition: all 0.5s ease-in-out;

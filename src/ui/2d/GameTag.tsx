@@ -116,7 +116,7 @@ function GameTag () {
                   enemyBoard.isEnemy = true
                   enemyBoard.state = BoardState.Fighting
                   setEnemyBoard(enemyBoard)
-                  selfBoard.state = BoardState.Over
+                  selfBoard.state = BoardState.Watching
                   aiPlayer.current.opponentBoard = selfBoard
                   setSelfBoard(selfBoard)
                   setGameState(GameState.Finding)

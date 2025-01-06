@@ -5,6 +5,7 @@ import { boards } from './boards'
 enum BoardState {
   Preparing,
   Fighting,
+  Watching,
   Analyzing,
   Over,
 }
@@ -33,14 +34,14 @@ class Board {
     this._state = BoardState.Preparing
     this._enemy = false
   }
-  
+
   /**
    * Generates all possible boards in the background, in chunks of the specified size.
-   * 
+   *
    * This method generates boards in chunks to avoid blocking the main thread. It continues
    * generating boards until all possible boards are generated. The generated boards are stored
    * in the static `Board.allPossible` array.
-   * 
+   *
    * @param size - The number of boards to generate in each chunk.
    * @returns An array of all possible boards.
    */
@@ -59,7 +60,7 @@ class Board {
     }
     return Board.allPossible
   }
-  
+
   public static allPossibleBoardsGenerated(): boolean {
     return Board.allPossible.length === boards.length
   }

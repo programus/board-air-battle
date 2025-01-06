@@ -16,6 +16,7 @@ function BlockTag({block}: BlockProps) {
     'pointer-events-through': [BoardState.Preparing, BoardState.Over, BoardState.Analyzing].includes(block.owner.state),
     'covered': [BoardState.Fighting].includes(block.owner.state) && !block.isHitted(),
     'analyzing-covered': BoardState.Analyzing === block.owner.state && !block.isHitted(),
+    'watching-covered': BoardState.Watching === block.owner.state && !block.isHitted(),
   })
   const planeClass = classNames({
     'block-layer': true,

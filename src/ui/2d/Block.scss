@@ -31,6 +31,11 @@
   border-color: $light-color $dark-color $dark-color $light-color;
 }
 
+.watching-covered {
+  background-color: $watching-cover-color;
+  border-color: $light-color $dark-color $dark-color $light-color;
+}
+
 @media (hover:hover) {
   .covered:hover {
     background-image: url(/images/2d/attack-crosshair.svg);
