@@ -1,0 +1,190 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="500" height="400">
+  <style>
+    .body-color {
+      fill: #005f73;
+    }
+    .front-wing-color {
+      fill: #bb3e03;
+    }
+    .back-wing-color {
+      fill: #ca6702;
+    }
+    .engine-color {
+      fill: #0a9396;
+    }
+    .propeller-color {
+      fill: #e9d8a6;
+    }
+    .cockpit-color {
+      fill: #ee9b00;
+    }
+    .engine-highlight {
+      stroke-width: 2;
+      stroke: #b0d3c7;
+      fill: #b0d3c7;
+    }
+    .cockpit-highlight {
+      stroke: white;
+      fill: white;
+      opacity: 0.6;
+    }
+
+    .highlight {
+      stroke: none;
+      fill: white;
+      opacity: 0.3;
+    }
+    .shadow {
+      stroke: none;
+      fill: black;
+      opacity: 0.5;
+    }
+  </style>
+  <g id="outline" visibility="hidden">
+    <rect id="block" width="100" height="100" fill="none" stroke="rgba(0, 0, 0, 0.5)" x="200" y="0" />
+    <use href="#block" y="100" />
+    <use href="#block" y="100" x="-200" />
+    <use href="#block" y="100" x="200" />
+    <use href="#block" y="100" x="-100" />
+    <use href="#block" y="100" x="100" />
+    <use href="#block" y="200" />
+    <use href="#block" y="300" />
+    <use href="#block" y="300" x="-100" />
+    <use href="#block" y="300" x="100" />
+  </g>
+
+  <g stroke="#001219" stroke-width="4">
+    <g id="front-wing" class="front-wing-color" transform="translate(250, 150)">
+      <g id="front-wing-content">
+        <path id="front-wing-right" d="M 0 -50 L 200 -50 C 250 -50 245 -20 245 -25 C 245 -20 240 50 100 40 C 50 40 50 20 30 80" />
+        <use href="#front-wing-right" transform="scale(-1, 1)" />
+      </g>
+      <mask id="front-wing-mask">
+        <use href="#front-wing-content" fill="white" />
+      </mask>
+      <g id="front-wing-highlight" class="highlight" mask="url(#front-wing-mask)">
+        <path d="M -250 -100 L -245 -40 C -245 -30 -245 -40 -200 -40 Q 0 -25 200 -40 C 250 -40 235 -20 245 -15 L 245 -100" />
+      </g>
+      <g id="front-wing-shadow" class="shadow" mask="url(#front-wing-mask)">
+        <path id="front-wing-back-shadow" d="M 45 -0 Q 50 50 250 40 L 0 50" />
+        <use href="#front-wing-back-shadow" transform="scale(-1, 1) translate(2, -5)" />
+        <path d="M 0 -50 L -70 -50 Q -80 -30 -60 50 L 0 50" />
+      </g>
+    </g>
+    <g id="back-wing" class="back-wing-color" transform="translate(250, 350)">
+      <g id="back-wing-content">
+        <path id="back-wing-right" d="M 0 -50 C 140 -50 120 0 120 0 Q 120 1.2 115 6 L 35 40 Q 15 50 0 -15" />
+        <use href="#back-wing-right" transform="scale(-1, 1)" />
+      </g>
+      <mask id="back-wing-mask">
+        <use href="#back-wing-content" fill="white" />
+      </mask>
+      <g id="back-wing-highlight" class="highlight" mask="url(#back-wing-mask)">
+        <path d="M -150 -100 L -120 10 C -120 -40 -60 -35 0 -35 S 130 -30 110 10 L 150 20 L 150 -100" />
+      </g>
+    </g>
+    <g id="propeller" class="propeller-color" transform="translate(250, 0)">
+      <g id="propeller-content">
+        <g id="propeller-right">
+          <path id="blade-right" d="M 1 0 C 20 -5 45 -10 50 0 C 45 10 20 5 1 0" transform="translate(0, 25)" />
+          <g class="cockpit-color">
+            <path id="axis-right" d="M -1 20 C 2 20 10 20 10 45 L -1 45" />
+          </g>
+        </g>
+        <use href="#propeller-right" transform="scale(-1, 1)" />
+      </g>
+      <mask id="half-propeller-axis-mask">
+        <use href="#axis-right" fill="white" />
+      </mask>
+      <g id="propeller-axis-highlight" class="highlight" mask="url(#half-propeller-axis-mask)">
+        <mask id="propeller-axis-highlight-mask" fill-opacity="1">
+          <use href="#axis-right" transform="scale(0.2, 1)" fill="black" />
+        </mask>
+        <use href="#axis-right" transform="scale(0.6, 1)" />
+      </g>
+      <g id="propeller-axis-shadow" class="shadow" mask="url(#half-propeller-axis-mask)" transform="scale(-1, 1)">
+        <mask id="propeller-axis-shadow-mask" fill-opacity="1">
+          <rect width="100" height="100" fill="white" />
+          <use href="#axis-right" transform="scale(0.45, 1)" fill="black" />
+        </mask>
+        <rect width="100" height="100" mask="url(#propeller-axis-shadow-mask)" />
+      </g>
+    </g>
+    <mask id="body-mask">
+      <use href="#body-shape" fill="white" transform="translate(0, 0)" />
+    </mask>
+    <g id="body" class="body-color" transform="translate(250, 0)">
+      <g id="body-shape">
+        <path id="body-right" d="M -2 38 L 30 38 C 50 38 50 38 50 100 L 49 100 C 35 350 2 370 -2 370" transform="scale(0.93, 1)" />
+        <use href="#body-right" transform="scale(-1, 1)" />
+      </g>
+      <g id="engine" class="engine-color" mask="url(#body-mask)">
+        <path d="M -50 0 Q 0 0 50 0 L 50 -100 L -50 -100 Z" transform="translate(0, 100)"/>
+      </g>
+      <g id="engine-highlight" class="engine-highlight" >
+        <rect width="20" height="4" x="5" y="45" rx="10" />
+        <rect width="6" height="4" x="33" y="45" rx="10" />
+      </g>
+      <g id="body-shadow" class="shadow" mask="url(#body-mask)">
+      </g>
+      <g id="body-highlight" class="highlight" mask="url(#body-mask)">
+        <mask id="body-highlight-mask" fill-opacity="1">
+          <rect width="500" height="400" fill="white" />
+          <use href="#body-right" transform="scale(0.2, 1)" fill="black" />
+        </mask>
+        <use href="#body-right" transform="scale(0.6, 1)" mask="url(#body-highlight-mask)" />
+      </g>
+      <path d="M -50 0 Q 0 0 50 0" transform="translate(0, 100)" />
+    </g>
+    <g id="cockpit" class="cockpit-color" transform="translate(250, 240)">
+      <g id="cockpit-body">
+        <g id="cockpit-front">
+          <path d="M -20 30 C -20 -15 20 -15 20 30 Q 0 35 -20 30" />
+        </g>
+        <g id="cockpit-back">
+          <path d="M -20 30 C -20 90 20 90 20 30 Q 0 35 -20 30" />
+        </g>
+      </g>
+      <use href="#cockpit-back" class="body-color" />
+      <path id="cockpit-highlight" d="M 9 10 Q 18 20 10 55 Q 13 20 9 10" class="cockpit-highlight" />
+      <mask id="cockpit-mask">
+        <use href="#cockpit-body" fill="white" />
+      </mask>
+      <g id="cockpit-shadow" class="shadow" mask="url(#cockpit-mask)">
+        <mask id="cockpit-shadow-mask" fill-opacity="1">
+          <rect width="500" height="400" fill="white" />
+          <path d="M 0 -10 C 15 -10 15 80 0 80" fill="black" />
+        </mask>
+        <rect width="500" height="400" mask="url(#cockpit-shadow-mask)" transform="scale(-1, 1)" />
+      </g>
+      <path d="M -20 30 Q 0 35 20 30" fill="none" />
+    </g>
+    <mask id="remain-shadow-mask">
+      <g fill="white" transform="translate(250, 0)">
+        <use href="#back-wing-content" transform="translate(0, 350)" />
+        <use href="#body-shape" />
+        <use href="#cockpit-body" transform="translate(0, 240)" fill="black" />
+      </g>
+    </mask>
+    <g id="remain-shadow" class="shadow" mask="url(#remain-shadow-mask)">
+      <g transform="translate(250, 0)">
+        <g mask="url(#body-mask)">
+          <mask id="body-shadow-mask" fill-opacity="1">
+            <rect width="500" height="400" fill="white" transform="scale(1, 1)"/>
+            <use href="#body-right" transform="scale(0.7, 1)" fill="black" />
+          </mask>
+          <rect width="500" height="400" mask="url(#body-shadow-mask)" transform="scale(-1, 1)" />
+        </g>
+        <g id="cockpit-body-shadow" transform="translate(-2, 239) scale(1.2)">
+          <use href="#cockpit-body" />
+        </g>
+        <polygon id="vertical-shadow-shape" points="0,300 -100,400 0,400" />
+      </g>
+    </g>
+    <g id="vertical-back-wing" class="engine-color" transform="translate(250, 350)">
+      <path id="vertical-back-wing-right" d="M 0 -50 C 1 -50 5 -50 5 10 C 5 45 1 45 0 45 " />
+      <use href="#vertical-back-wing-right" transform="scale(-1, 1)" />
+      <use href="#vertical-back-wing-right" transform="scale(-1, 1)" class="shadow" />
+    </g>
+  </g>
+</svg>

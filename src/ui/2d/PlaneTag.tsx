@@ -1,6 +1,9 @@
 import './Plane.scss'
 import { FighterDirection, FighterPlane } from '../../core'
 import classNames from 'classnames'
+import { cellSize, ImageCacheContext, planeFrameCount } from './misc/image-caches'
+import { useContext, useRef } from 'react'
+import { useAnimationFrame } from './misc/hooks'
 
 interface PlaneProps {
   plane: FighterPlane,
@@ -8,26 +11,33 @@ interface PlaneProps {
 }
 
 function PlaneTag({plane, notLayoutReady}: PlaneProps) {
-  let transform = ''
-  switch (plane.dir) {
-    case FighterDirection.Up: {
-      transform = `translate(${plane.pos[0] * 20 - 40}%, ${plane.pos[1] * 25}%) scaleX(-1)`
-      break
-    }
-    case FighterDirection.Down: {
-      transform = `rotate(180deg) translate(${-plane.pos[0] * 20 + 40}%, ${-plane.pos[1] * 25 + 75}%)`
-      break
-    }
-    case FighterDirection.Left: {
-      transform = `rotate(-90deg) translate(${-plane.pos[1] * 20 + 30}%, ${plane.pos[0] * 25 - 12.5}%)`
-      break
-    }
-    case FighterDirection.Right: {
-      transform = `rotate(90deg) translate(${plane.pos[1] * 20 - 30}%, ${-plane.pos[0] * 25 + 87.5}%) scaleX(-1)`
-    }
+  const { planeCache } = useContext(ImageCacheContext)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const transformMap = {
+    [FighterDirection.Up]: `translate(${plane.pos[0] * 20 - 40}%, ${plane.pos[1] * 25}%) scaleX(-1)`,
+    [FighterDirection.Down]: `rotate(180deg) translate(${-plane.pos[0] * 20 + 40}%, ${-plane.pos[1] * 25 + 75}%)`,
+    [FighterDirection.Left]: `rotate(-90deg) translate(${-plane.pos[1] * 20 + 30}%, ${plane.pos[0] * 25 - 12.5}%)`,
+    [FighterDirection.Right]: `rotate(90deg) translate(${plane.pos[1] * 20 - 30}%, ${-plane.pos[0] * 25 + 87.5}%) scaleX(-1)`,
   }
+  const transform = transformMap[plane.dir]
+  const aniDuration = 300
+  const msPerFrame = aniDuration / planeFrameCount
 
-  // console.log(transform)
+  useAnimationFrame((deltaTime, totalTime) => {
+    (async () => {
+      await planeCache.waitForAllImages?.()
+      const canvas = canvasRef.current
+      if (canvas) {
+        const ctx = canvas.getContext('2d')
+        if (ctx) {
+          const frameIndex = Math.floor(totalTime / msPerFrame) % planeFrameCount
+          const { cache, imageSize } = planeCache
+          ctx.clearRect(0, 0, cellSize * 5, cellSize * 4)
+          ctx.drawImage(cache, imageSize.width * frameIndex, 0, imageSize.width, imageSize.height, 0, 0, imageSize.width, imageSize.height)
+        }
+      }
+    })()
+  })
 
   const tagClasses = classNames({
     'plane-moving': plane.moving,
@@ -36,7 +46,9 @@ function PlaneTag({plane, notLayoutReady}: PlaneProps) {
   return (
     <div className={tagClasses} style={{
       transform,
-    }}> </div>
+    }}>
+      <canvas ref={canvasRef} width={cellSize * 5} height={cellSize * 4} />
+    </div>
   )
 }
 
