@@ -153,6 +153,11 @@ function BoardTag({board, width, onUpdated}: BoardProps) {
     'top': true,
     'pointer-events-through': true,
   })
+  const boardClass = classNames({
+    'board-frame': true,
+    'main-board': true,
+    'cloud-background': board.state !== BoardState.Watching,
+  })
 
   const blocks = board.blocks
   const blockMetas = useMemo(() => {
@@ -166,7 +171,7 @@ function BoardTag({board, width, onUpdated}: BoardProps) {
   useAnimationFrame((deltaTime, totalTime) => {
     const canvases = [frameCanvasRef.current, explosionCanvasRef.current]
     const ctxs = canvases.map(canvas => canvas?.getContext('2d'))
-    ctxs.forEach((ctx, i) => ctx && canvases[i] && ctx.clearRect(0, 0, canvases[i].width, canvases[i].height))
+    ctxs.forEach((ctx, i) => ctx && canvases[i] && ctx.clearRect(0, 0, canvases[i]?.width || 0, canvases[i]?.height || 0))
     blockMetas.forEach((row, i) => {
       row.forEach((meta, j) => {
         const x = j * cellSize
@@ -178,8 +183,8 @@ function BoardTag({board, width, onUpdated}: BoardProps) {
   })
 
   return (
-    <div className='board-frame main-board' style={{
-      width: width,
+    <div className={boardClass} style={{
+      width,
     }}>
       <div className='board'>
         {
