@@ -5,6 +5,7 @@ import { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { bodyExplosionFrameCount, cellSize, coreExplosionFrameCount, ImageCache, ImageCacheContext } from './misc/image-caches'
 import { useAnimationFrame } from './misc/hooks'
 import classNames from 'classnames'
+import { createContext } from 'react'
 
 type BlockDrawMeta = {
   block: Block,
@@ -136,6 +137,8 @@ const showExplosionStates = new Set([
   BoardState.Over,
 ])
 
+const BoardContext = createContext<Board>(Board.allPossible[0])
+
 function BoardTag({board, width, onUpdated}: BoardProps) {
   const [,setUpdate] = useState({})
   const forceUpdate = useCallback(() => {
@@ -157,6 +160,7 @@ function BoardTag({board, width, onUpdated}: BoardProps) {
     'board-frame': true,
     'main-board': true,
     'cloud-background': board.state !== BoardState.Watching,
+    'sketch-board': board.state === BoardState.Watching,
   })
 
   const blocks = board.blocks
@@ -186,20 +190,23 @@ function BoardTag({board, width, onUpdated}: BoardProps) {
     <div className={boardClass} style={{
       width,
     }}>
-      <div className='board'>
-        {
-          showExplosionStates.has(board.state) ? (
-            <canvas className={explosionClass} ref={explosionCanvasRef} width={cellSize * Board.width} height={cellSize * Board.height} />
-          ) : undefined
-        }
-        <canvas className={frameClass} ref={frameCanvasRef} width={cellSize * Board.width} height={cellSize * Board.height} />
-      </div>
-      <PlanesLayer board={board} onUpdated={forceUpdate} />
+      <BoardContext.Provider value={board}>
+        <div className='board'>
+          {
+            showExplosionStates.has(board.state) ? (
+              <canvas className={explosionClass} ref={explosionCanvasRef} width={cellSize * Board.width} height={cellSize * Board.height} />
+            ) : undefined
+          }
+          <canvas className={frameClass} ref={frameCanvasRef} width={cellSize * Board.width} height={cellSize * Board.height} />
+        </div>
+        <PlanesLayer board={board} onUpdated={forceUpdate} />
+      </BoardContext.Provider>
     </div>
   )
 }
 
 export {
+  BoardContext,
   BoardTag,
   type BoardProps,
 }

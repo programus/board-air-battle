@@ -34,3 +34,8 @@
 .moving-plane {
   cursor: grab;
 }
+
+.sketch-plane {
+  mix-blend-mode: screen;
+  filter: grayscale(100%);
+}

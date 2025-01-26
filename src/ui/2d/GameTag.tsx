@@ -160,13 +160,12 @@ function GameTag () {
               case GameState.Fighting: {
                 if (enemyBoard.state === BoardState.Fighting && enemyMovingState === 'moved') {
                   const turnCount = enemyBoard.blocks.flat().filter(b => b.isHitted()).length
-                  const count = aiPlayer.current.playTurn(turnCount, (ai, hittedType) => {
+                  const count = aiPlayer.current.playTurn(turnCount, (ai, hitPos, hittedType) => {
                     // simulate ai thinking time
                     setTimeout(() => {
-                      console.log('%c%s', 'color: red', enemyBoard.toString())
                       enemyBoard.isLocked = false
                       setEnemyBoard(enemyBoard)
-                      console.log('%c%s', 'color: red', enemyBoard.toString())
+                      selfBoard.blockAt(hitPos).setHitted(true)
                       playEffect(hittedType, 0.6)
                       setGameTurn(ai.turnCount)
                       setEnemyMovingState('moved')

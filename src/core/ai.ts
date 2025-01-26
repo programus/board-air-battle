@@ -33,7 +33,7 @@ class AiPlayer {
   }
 
   set opponentBoard(v: Board) {
-    this._opponentBoard = v
+    this._opponentBoard = Board.generateBoard(v.toPlaneString())
   }
 
   // getter of possibleBoards
@@ -56,7 +56,7 @@ class AiPlayer {
     return pos as [number, number]
   }
 
-  playTurn(turnCount: number, callback: (ai: AiPlayer, hittedType: HittedType) => void): number {
+  playTurn(turnCount: number, callback: (ai: AiPlayer, hitPos: [x: number, y: number], hittedType: HittedType) => void): number {
     let count = 0
     for (; this._turnCount < turnCount; this._turnCount++) {
       const guessedBoard = this._possibleBoards[0]
@@ -78,7 +78,7 @@ class AiPlayer {
         return ret
       })
       if (callback) {
-        callback(this, feedback!)
+        callback(this, pos, feedback!)
       }
       count++
     }
