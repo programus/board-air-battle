@@ -3,7 +3,6 @@ import { GameTag } from './ui/2d/GameTag'
 
 
 function App() {
-  console.log('start app')
   return (
     <>
       <GameTag />

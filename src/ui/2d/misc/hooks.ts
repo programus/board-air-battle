@@ -1,17 +1,25 @@
 import { useCallback, useEffect, useRef } from "react"
 
-const useAnimationFrame = (callback: (deltaTime: number, totalTime: number) => void) => {
+const useAnimationFrame = (callback: (deltaTime: number, totalTime: number) => void, interval: number = 0) => {
   const requestRef = useRef<number>()
   const previousTimeRef = useRef<number>()
 
   const animate = useCallback((time: number) => {
-    if (previousTimeRef.current !== undefined) {
-      const deltaTime = time - previousTimeRef.current
-      callback(deltaTime, time)
-    }
+    const deltaTime = previousTimeRef.current ? time - previousTimeRef.current : 0
+    const timeBeforeCallback = new Date().getTime()
+    callback(deltaTime, time)
+    const callbackTime = new Date().getTime() - timeBeforeCallback
+
     previousTimeRef.current = time
-    requestRef.current = requestAnimationFrame(animate)
-  }, [callback])
+    const remainTime = interval - callbackTime
+    if (remainTime > 0) {
+      setTimeout(() => {
+        requestRef.current = requestAnimationFrame(animate)
+      }, remainTime)
+    } else {
+      requestRef.current = requestAnimationFrame(animate)
+    }
+  }, [callback, interval])
 
   useEffect(() => {
     requestRef.current = requestAnimationFrame(animate)

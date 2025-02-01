@@ -1,7 +1,7 @@
 import './Board.scss'
 import { Block, Board, BoardState, HittedType } from '../../core';
 import { PlanesLayer } from './PlanesLayer';
-import { useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { bodyExplosionFrameCount, cellSize, coreExplosionFrameCount, ImageCache, ImageCacheContext } from './misc/image-caches'
 import { useAnimationFrame } from './misc/hooks'
 import classNames from 'classnames'
@@ -13,9 +13,11 @@ type BlockDrawMeta = {
   timeOffset: number,
 }
 
-const aniDuration = 2000
+type CanvasContext = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
 
-function drawBlockFrame(ctx: CanvasRenderingContext2D, meta: BlockDrawMeta, x: number, y: number) {
+const msPerFrame = Math.floor(2000 / 8)
+
+function drawBlockFrame(ctx: CanvasContext, meta: BlockDrawMeta, x: number, y: number) {
   const { block } = meta
   const state = block.owner.state
   const fillStyles: Partial<Record<BoardState, string>> = {
@@ -48,11 +50,10 @@ function drawBlockFrame(ctx: CanvasRenderingContext2D, meta: BlockDrawMeta, x: n
   ctx.translate(-x, -y)
 }
 
-function drawAniExplosion(ctx: CanvasRenderingContext2D, cache: ImageCache, meta: BlockDrawMeta, totalTime: number) {
+function drawAniExplosion(ctx: CanvasContext, cache: ImageCache, meta: BlockDrawMeta, totalTime: number) {
   const { block, timeOffset } = meta
   const index = block.hittedType === HittedType.PlaneBody ? 0 : 1
   const frameCount = block.hittedType === HittedType.PlaneBody ? bodyExplosionFrameCount : coreExplosionFrameCount
-  const msPerFrame = aniDuration / frameCount
   const passedFrameCount = (totalTime + timeOffset) / msPerFrame
   const prevIndex = Math.floor(passedFrameCount - 1) % frameCount
   const nextAlpha = passedFrameCount - Math.floor(passedFrameCount)
@@ -67,12 +68,13 @@ function drawAniExplosion(ctx: CanvasRenderingContext2D, cache: ImageCache, meta
   ctx.globalAlpha = 1
 }
 
-function drawBodyExplosion(ctx: CanvasRenderingContext2D, cache: ImageCache, meta: BlockDrawMeta, totalTime: number) {
+function drawBodyExplosion(ctx: CanvasContext, cache: ImageCache, meta: BlockDrawMeta, totalTime: number) {
   drawAniExplosion(ctx, cache, meta, totalTime)
 }
 
-function drawCoreExplosion(ctx: CanvasRenderingContext2D, cache: ImageCache, meta: BlockDrawMeta, totalTime: number) {
+function drawCoreExplosion(ctx: CanvasContext, cache: ImageCache, meta: BlockDrawMeta, totalTime: number) {
   const { timeOffset } = meta
+  const aniDuration = msPerFrame * coreExplosionFrameCount
   const passedCycles = (totalTime + timeOffset) / aniDuration
   const currentPartial = passedCycles - Math.floor(passedCycles)
   const fillStyle = ctx.createRadialGradient(cellSize / 2, cellSize / 2, 0, cellSize / 2, cellSize / 2, cellSize / 2 * (1 + currentPartial))
@@ -99,10 +101,10 @@ function drawCoreExplosion(ctx: CanvasRenderingContext2D, cache: ImageCache, met
   drawAniExplosion(ctx, cache, meta, totalTime)
 }
 
-async function drawBlockExplosion(ctx: CanvasRenderingContext2D, cache: ImageCache, meta: BlockDrawMeta, x: number, y: number, totalTime: number) {
+async function drawBlockExplosion(ctx: CanvasContext, cache: ImageCache, meta: BlockDrawMeta, x: number, y: number, totalTime: number) {
   const { block, rotation } = meta
   const needDraw = block.isHitted()
-  const drawExplosion = (explosion: (ctx: CanvasRenderingContext2D, cache: ImageCache, meta: BlockDrawMeta, totalTime: number) => void) => {
+  const drawExplosion = (explosion: (ctx: CanvasContext, cache: ImageCache, meta: BlockDrawMeta, totalTime: number) => void) => {
     if (needDraw) {
       ctx.translate(x, y)
       ctx.translate(cellSize / 2, cellSize / 2)
@@ -115,7 +117,6 @@ async function drawBlockExplosion(ctx: CanvasRenderingContext2D, cache: ImageCac
       ctx.translate(-x, -y)
     }
   }
-  await cache.waitForAllImages?.()
   if (block.hittedType === HittedType.PlaneBody) {
     drawExplosion(drawBodyExplosion)
   } else if (block.hittedType === HittedType.PlaneCore) {
@@ -139,7 +140,7 @@ const showExplosionStates = new Set([
 
 const BoardContext = createContext<Board>(Board.allPossible[0])
 
-function BoardTag({board, width, onUpdated}: BoardProps) {
+function BoardTag({board, width, onUpdated, turnCount}: BoardProps) {
   const [,setUpdate] = useState({})
   const forceUpdate = useCallback(() => {
     setUpdate({})
@@ -156,12 +157,12 @@ function BoardTag({board, width, onUpdated}: BoardProps) {
     'top': true,
     'pointer-events-through': true,
   })
-  const boardClass = classNames({
+  const boardClass = useMemo(() => classNames({
     'board-frame': true,
     'main-board': true,
     'cloud-background': board.state !== BoardState.Watching,
     'sketch-board': board.state === BoardState.Watching,
-  })
+  }), [board.state])
 
   const blocks = board.blocks
   const blockMetas = useMemo(() => {
@@ -172,19 +173,42 @@ function BoardTag({board, width, onUpdated}: BoardProps) {
     })))
   }, [blocks])
 
-  useAnimationFrame((deltaTime, totalTime) => {
-    const canvases = [frameCanvasRef.current, explosionCanvasRef.current]
-    const ctxs = canvases.map(canvas => canvas?.getContext('2d'))
-    ctxs.forEach((ctx, i) => ctx && canvases[i] && ctx.clearRect(0, 0, canvases[i]?.width || 0, canvases[i]?.height || 0))
-    blockMetas.forEach((row, i) => {
-      row.forEach((meta, j) => {
-        const x = j * cellSize
-        const y = i * cellSize
-        ctxs[1] && drawBlockExplosion(ctxs[1]!, explosionCache, meta, x, y, totalTime)
-        ctxs[0] && drawBlockFrame(ctxs[0]!, meta, x, y)
+  console.log('rendered\n', board.toString())
+  useAnimationFrame(async (deltaTime, totalTime) => {
+    const canvas = explosionCanvasRef.current
+    const ctx = canvas?.getContext('2d')
+    if (canvas && ctx) {
+      await explosionCache.waitForAllImages?.()
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      blockMetas.forEach((row, i) => {
+        row.forEach((meta, j) => {
+          const x = j * cellSize
+          const y = i * cellSize
+          if (meta.block.isHitted()) {
+            drawBlockExplosion(ctx, explosionCache, meta, x, y, totalTime)
+          }
+        })
       })
-    })
-  })
+    }
+  }, msPerFrame * 1)
+
+  useEffect(() => {
+    (async () => {
+      const canvas = frameCanvasRef.current
+      const ctx = canvas?.getContext('2d')
+      if (canvas && ctx) {
+        await explosionCache.waitForAllImages?.()
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        blockMetas.forEach((row, i) => {
+          row.forEach((meta, j) => {
+            const x = j * cellSize
+            const y = i * cellSize
+            drawBlockFrame(ctx, meta, x, y)
+          })
+        })
+      }
+    })()
+  }, [blockMetas, explosionCache, turnCount])
 
   return (
     <div className={boardClass} style={{

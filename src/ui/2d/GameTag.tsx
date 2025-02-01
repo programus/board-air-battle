@@ -119,6 +119,7 @@ function GameTag () {
       'self-preparing': isPreparing,
       'self-playing': !isPreparing,
     })
+
     return (
       <div className="board-container">
         <div className="game-control">
@@ -203,7 +204,7 @@ function GameTag () {
         gameState === GameState.Title ? (
           <GameTitle />
         ) : (
-          GameOngoing()
+          <GameOngoing />
         )
       }
     </div>

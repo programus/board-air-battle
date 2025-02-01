@@ -2,7 +2,7 @@ import './Plane.scss'
 import { BoardState, FighterDirection, FighterPlane } from '../../core'
 import classNames from 'classnames'
 import { cellSize, ImageCacheContext, planeFrameCount } from './misc/image-caches'
-import { useContext, useRef } from 'react'
+import { useContext, useMemo, useRef } from 'react'
 import { useAnimationFrame } from './misc/hooks'
 import { BoardContext } from './BoardTag'
 
@@ -25,6 +25,7 @@ function PlaneTag({plane, notLayoutReady}: PlaneProps) {
   const msPerFrame = aniDuration / planeFrameCount
   const board = useContext(BoardContext)
   const isWatching = board.state === BoardState.Watching
+  const frameIndexOffset = useMemo(() => Math.floor(Math.random() * planeFrameCount), [])
 
   useAnimationFrame((deltaTime, totalTime) => {
     (async () => {
@@ -33,14 +34,14 @@ function PlaneTag({plane, notLayoutReady}: PlaneProps) {
       if (canvas) {
         const ctx = canvas.getContext('2d')
         if (ctx) {
-          const frameIndex = isWatching ? 0 : Math.floor(totalTime / msPerFrame) % planeFrameCount
+          const frameIndex = isWatching ? 0 : Math.floor(totalTime / msPerFrame + frameIndexOffset) % planeFrameCount
           const { cache, imageSize } = planeCache
           ctx.clearRect(0, 0, cellSize * 5, cellSize * 4)
           ctx.drawImage(cache, imageSize.width * frameIndex, 0, imageSize.width, imageSize.height, 0, 0, imageSize.width, imageSize.height)
         }
       }
     })()
-  })
+  }, msPerFrame)
 
   const tagClasses = classNames({
     'plane-moving': plane.moving,
