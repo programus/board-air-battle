@@ -6,6 +6,7 @@ import { bodyExplosionFrameCount, cellSize, coreExplosionFrameCount, ImageCache,
 import { useAnimationFrame } from './misc/hooks'
 import classNames from 'classnames'
 import { createContext } from 'react'
+import Rand from 'rand-seed'
 
 type BlockDrawMeta = {
   block: Block,
@@ -15,39 +16,15 @@ type BlockDrawMeta = {
 
 type CanvasContext = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
 
-const msPerFrame = Math.floor(2000 / 8)
+const msPerFrame = Math.floor(1000 / 10)
 
-function drawBlockFrame(ctx: CanvasContext, meta: BlockDrawMeta, x: number, y: number) {
+function drawBlockFrame(ctx: CanvasContext, cache: ImageCache, meta: BlockDrawMeta, x: number, y: number) {
   const { block } = meta
   const state = block.owner.state
-  const fillStyles: Partial<Record<BoardState, string>> = {
-    [BoardState.Fighting]: '#90c1e9e6',
-    [BoardState.Analyzing]: '#c7b2b3e6',
-    [BoardState.Watching]: '#0000004d',
-  }
-  const highlightStyle = 'rgba(255, 255, 255, .2)'
-  const shadowStyle = 'rgba(0, 0, 0, .2)'
-  ctx.translate(x, y)
-  const fillStyle = fillStyles[state]
-  const isCovered = fillStyle && !block.isHitted()
-  if (isCovered) {
-    ctx.fillStyle = fillStyles[state] || ''
-    ctx.fillRect(0, 0, cellSize, cellSize)
-  }
-  ctx.lineWidth = 1
-  ctx.beginPath()
-  ctx.strokeStyle = !isCovered ? shadowStyle : highlightStyle
-  ctx.moveTo(0, cellSize - 1)
-  ctx.lineTo(0, 0)
-  ctx.lineTo(cellSize - 1, 0)
-  ctx.stroke()
-  ctx.beginPath()
-  ctx.strokeStyle = !isCovered ? highlightStyle : shadowStyle
-  ctx.moveTo(cellSize - 1, 0)
-  ctx.lineTo(cellSize - 1, cellSize - 1)
-  ctx.lineTo(0, cellSize - 1)
-  ctx.stroke()
-  ctx.translate(-x, -y)
+  const sx = state as number
+  const isCovered = !block.isHitted() && (state > BoardState.Preparing)
+  const sy = isCovered ? 1 : 0
+  ctx.drawImage(cache.cache, sx * cellSize, sy * cellSize, cellSize, cellSize, x, y, cellSize, cellSize)
 }
 
 function drawAniExplosion(ctx: CanvasContext, cache: ImageCache, meta: BlockDrawMeta, totalTime: number) {
@@ -129,6 +106,7 @@ interface BoardProps {
   width?: string,
   onUpdated?: () => void,
   turnCount?: number,
+  name?: string,
 }
 
 const showExplosionStates = new Set([
@@ -140,13 +118,13 @@ const showExplosionStates = new Set([
 
 const BoardContext = createContext<Board>(Board.allPossible[0])
 
-function BoardTag({board, width, onUpdated, turnCount}: BoardProps) {
-  const [,setUpdate] = useState({})
+function BoardTag({board, width, onUpdated, turnCount, name}: BoardProps) {
+  const [update, setUpdate] = useState({})
   const forceUpdate = useCallback(() => {
     setUpdate({})
     onUpdated && onUpdated()
   }, [onUpdated])
-  const { explosionCache } = useContext(ImageCacheContext)
+  const { explosionCache, blockFrameCache } = useContext(ImageCacheContext)
   const frameCanvasRef = useRef<HTMLCanvasElement>(null)
   const explosionCanvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -160,20 +138,22 @@ function BoardTag({board, width, onUpdated, turnCount}: BoardProps) {
   const boardClass = useMemo(() => classNames({
     'board-frame': true,
     'main-board': true,
-    'cloud-background': board.state !== BoardState.Watching,
+    'board-background': board.state !== BoardState.Watching,
+    // 'cloud-background': board.state !== BoardState.Watching,
     'sketch-board': board.state === BoardState.Watching,
   }), [board.state])
+
+  const rand = useMemo(() => new Rand(name || 'board'), [name])
 
   const blocks = board.blocks
   const blockMetas = useMemo(() => {
     return blocks.map((row) => row.map((block) => ({
       block: block,
-      rotation: Math.random() * 2 * Math.PI,
-      timeOffset: Math.random() * 1000,
+      rotation: rand.next() * 2 * Math.PI,
+      timeOffset: rand.next() * 1000,
     })))
-  }, [blocks])
+  }, [blocks, rand])
 
-  console.log('rendered\n', board.toString())
   useAnimationFrame(async (deltaTime, totalTime) => {
     const canvas = explosionCanvasRef.current
     const ctx = canvas?.getContext('2d')
@@ -203,12 +183,12 @@ function BoardTag({board, width, onUpdated, turnCount}: BoardProps) {
           row.forEach((meta, j) => {
             const x = j * cellSize
             const y = i * cellSize
-            drawBlockFrame(ctx, meta, x, y)
+            drawBlockFrame(ctx, blockFrameCache, meta, x, y)
           })
         })
       }
     })()
-  }, [blockMetas, explosionCache, turnCount])
+  }, [blockMetas, explosionCache, blockFrameCache, turnCount, update])
 
   return (
     <div className={boardClass} style={{

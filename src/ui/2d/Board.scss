@@ -2,10 +2,16 @@
 
 .board-frame {
   position: relative;
+  margin: 1rem;
   border: solid $border-thick #fff1;
   aspect-ratio: 1;
   border-radius: 1em;
   box-shadow: 0 0 1em 0.5em #0003;
+}
+
+.board-background {
+  // box-shadow: 0 0 1em 0.5em $sky-blue;
+  background-color: $sky-blue;
 }
 
 .cloud-background {
@@ -16,6 +22,10 @@
   background-origin: border-box;
   background-clip: padding-box;
   background-repeat: repeat-x;
+  animation-name: board-background-animation;
+  animation-duration: 120s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
 }
 
 .sketch-board {

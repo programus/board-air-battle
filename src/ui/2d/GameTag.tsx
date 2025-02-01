@@ -56,6 +56,11 @@ function playBgm(audio: CustomAudio, state: GameState) {
   }
 }
 
+const AiThinkingTime = {
+  min: 500,
+  max: 3000,
+}
+
 function GameTag () {
   const [gameState, setGameState] = useState<GameState>(GameState.Title)
   const [selfBoard, setSelfBoard] = useState<Board>(Board.placeholder)
@@ -176,7 +181,7 @@ function GameTag () {
                         setEnemyBoard(enemyBoard)
                         setGameState(GameState.End)
                       }
-                    }, Math.random() * 5000 + 500)
+                    }, Math.random() * (AiThinkingTime.max - AiThinkingTime.min) + AiThinkingTime.min)
                   })
                   if (count > 0) {
                     setEnemyMovingState('moving')

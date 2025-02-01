@@ -1,5 +1,5 @@
 import { createContext } from "react"
-import { Board } from "../../../core"
+import { Board, BoardState } from "../../../core"
 
 const screenWidth = window.innerWidth
 const screenHeight = window.innerHeight
@@ -16,6 +16,68 @@ export type ImageCache = {
     width: number
     height: number
   }
+}
+
+function initializeBlockFrameCache(): ImageCache {
+  const allBoardStates = [
+    BoardState.Preparing,
+    BoardState.Fighting,
+    BoardState.Watching,
+    BoardState.Analyzing,
+    BoardState.Over,
+  ]
+  const cache = new OffscreenCanvas(cellSize * allBoardStates.length, cellSize * 2)
+  const ctx = cache.getContext('2d')
+  const fillStyles: Partial<Record<BoardState, string>> = {
+    [BoardState.Fighting]: '#90c1e9e6',
+    [BoardState.Analyzing]: '#c7b2b3e6',
+    [BoardState.Watching]: '#0000004d',
+    [BoardState.Over]: '#00000033',
+  }
+  const highlightStyle = 'rgba(255, 255, 255, .2)'
+  const shadowStyle = 'rgba(0, 0, 0, .2)'
+  if (ctx) {
+    allBoardStates.forEach((state, i) => {
+      const fillStyle = fillStyles[state];
+      [0, 1].forEach((index) => {
+        const isCovered = !!index
+        const [x, y] = [i * cellSize, index * cellSize]
+        ctx.translate(x, y)
+        // draw cover if needed
+        if (fillStyle && isCovered) {
+          ctx.fillStyle = fillStyle
+          ctx.fillRect(0, 0, cellSize, cellSize)
+        }
+        // draw frame lines
+        ctx.lineWidth = 1
+        ctx.beginPath()
+        ctx.strokeStyle = !isCovered ? shadowStyle : highlightStyle
+        ctx.moveTo(0, cellSize - 1)
+        ctx.lineTo(0, 0)
+        ctx.lineTo(cellSize - 1, 0)
+        ctx.stroke()
+        ctx.beginPath()
+        ctx.strokeStyle = !isCovered ? highlightStyle : shadowStyle
+        ctx.moveTo(cellSize - 1, 0)
+        ctx.lineTo(cellSize - 1, cellSize - 1)
+        ctx.lineTo(0, cellSize - 1)
+        ctx.stroke()
+
+        ctx.translate(-x, -y)
+      })
+    })
+  }
+  const ret = {
+    cache,
+    waitForAllImages: () => new Promise<OffscreenCanvas>(resolve => {
+      resolve(cache)
+    }),
+    imageSize: {
+      width: cellSize,
+      height: cellSize,
+    }
+  }
+  return ret
 }
 
 function initExplosionCache(): ImageCache {
@@ -153,14 +215,17 @@ function initPlaneCache(): ImageCache {
 
 const explosionCache = initExplosionCache()
 const planeCache = initPlaneCache()
+const blockFrameCache = initializeBlockFrameCache()
 
 
 export type ImageCanvasRepository = {
   explosionCache: ImageCache
   planeCache: ImageCache
+  blockFrameCache: ImageCache
 }
 
 export const ImageCacheContext = createContext<ImageCanvasRepository>({
   explosionCache,
   planeCache,
+  blockFrameCache,
 })
