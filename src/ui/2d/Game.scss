@@ -1,8 +1,14 @@
 @use "var.scss" as *;
 
 .game-root {
-  width: min(95vw, 85vh);
-  margin-bottom: 15vh;
+  width: 100svw;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  // margin-bottom: 15vh;
+  background-color: $navy-green;
 }
 
 .game-panel {
@@ -14,6 +20,7 @@
   position: relative;
   display: flex;
   justify-content: center;
+  width: min(95vw, 85vh);
 }
 
 .enemy-preparing {

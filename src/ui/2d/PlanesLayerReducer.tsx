@@ -72,20 +72,21 @@ function pointerUpPreparing(state: BoardPlayState, {board, event, target}: Actio
 
 function pointerMovePreparing(state: BoardPlayState, {event, target}: Action): BoardPlayState {
   const captured = target.hasPointerCapture(event.pointerId)
+  const autoAdjustPlane = false
   if (captured) {
     state = {...state, newPlane: null}
     const blockPos = getBlockPosFromEvent(event, target)
     if (state.pressedPos && !areArrayEqual(blockPos, state.pressedPos)) {
       state.dragged = true
     }
-    let needPlane = !state.focusedPlane
+    let regeneratePlaneRequired = !state.focusedPlane
     if (state.focusedPlane) {
       state.focusedPlane.pos = blockPos.map((v, i) => v + state.posOffset[i]) as [number, number]
-      if (!state.focusedPlane.isReady()) {
-        needPlane = true
+      if (autoAdjustPlane && !state.focusedPlane.isReady()) {
+        regeneratePlaneRequired = true
       }
     }
-    if (needPlane) {
+    if (autoAdjustPlane && regeneratePlaneRequired) {
       state.newPlane = generatePlane(blockPos)
       state.focusedPlane = state.newPlane || state.focusedPlane
     }

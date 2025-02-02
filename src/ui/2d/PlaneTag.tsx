@@ -14,6 +14,10 @@ interface PlaneProps {
 function PlaneTag({plane, notLayoutReady}: PlaneProps) {
   const { planeCache } = useContext(ImageCacheContext)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const shadowSizeRatio = {
+    width: 0.02,
+    height: 0.02,
+  }
   const transformMap = {
     [FighterDirection.Up]: `translate(${plane.pos[0] * 20 - 40}%, ${plane.pos[1] * 25}%) scaleX(-1)`,
     [FighterDirection.Down]: `rotate(180deg) translate(${-plane.pos[0] * 20 + 40}%, ${-plane.pos[1] * 25 + 75}%)`,
@@ -27,20 +31,28 @@ function PlaneTag({plane, notLayoutReady}: PlaneProps) {
   const isWatching = board.state === BoardState.Watching
   const frameIndexOffset = useMemo(() => Math.floor(Math.random() * planeFrameCount), [])
 
-  useAnimationFrame((deltaTime, totalTime) => {
-    (async () => {
-      await planeCache.waitForAllImages?.()
-      const canvas = canvasRef.current
-      if (canvas) {
-        const ctx = canvas.getContext('2d')
-        if (ctx) {
-          const frameIndex = isWatching ? 0 : Math.floor(totalTime / msPerFrame + frameIndexOffset) % planeFrameCount
-          const { cache, imageSize } = planeCache
-          ctx.clearRect(0, 0, cellSize * 5, cellSize * 4)
-          ctx.drawImage(cache, imageSize.width * frameIndex, 0, imageSize.width, imageSize.height, 0, 0, imageSize.width, imageSize.height)
+  useAnimationFrame(async (deltaTime, totalTime) => {
+    await planeCache.waitForAllImages?.()
+    const canvas = canvasRef.current
+    if (canvas) {
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        const frameIndex = isWatching ? 0 : Math.floor(totalTime / msPerFrame + frameIndexOffset) % planeFrameCount
+        const { cache, imageSize } = planeCache
+        const shadowOffset = {
+          x: canvas.width * shadowSizeRatio.width,
+          y: canvas.height * shadowSizeRatio.height * (plane.dir === FighterDirection.Left || plane.dir === FighterDirection.Up ? 1 : -1),
         }
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        const prevComposite = ctx.globalCompositeOperation
+        ctx.globalCompositeOperation = 'destination-in'
+        ctx.drawImage(cache, imageSize.width * frameIndex, 0, imageSize.width, imageSize.height, 0, shadowOffset.y, imageSize.width, imageSize.height)
+        ctx.globalCompositeOperation = prevComposite
+        ctx.drawImage(cache, imageSize.width * frameIndex, 0, imageSize.width, imageSize.height, shadowOffset.x, 0, imageSize.width, imageSize.height)
       }
-    })()
+    }
   }, msPerFrame)
 
   const tagClasses = classNames({
@@ -52,7 +64,11 @@ function PlaneTag({plane, notLayoutReady}: PlaneProps) {
     <div className={tagClasses} style={{
       transform,
     }}>
-      <canvas ref={canvasRef} width={cellSize * 5} height={cellSize * 4} />
+      <canvas ref={canvasRef} width={cellSize * 5 * (1 + shadowSizeRatio.width)} height={cellSize * 4 * (1 + shadowSizeRatio.height)} style={{
+        width: `${(1 + shadowSizeRatio.width) * 100}%`,
+        height: `${(1 + shadowSizeRatio.height) * 100}%`,
+        transform: `translate(${-shadowSizeRatio.width * 100}%, 0%)`,
+      }} />
     </div>
   )
 }
